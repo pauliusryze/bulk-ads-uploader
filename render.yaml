@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: meta-ads-uploader
+    env: node
+    buildCommand: |
+      cd frontend && npm install && npm run build
+      cd ../backend && npm install
+    startCommand: |
+      cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REACT_APP_FACEBOOK_APP_ID
+        sync: false
+      - key: REACT_APP_API_URL
+        value: https://meta-ads-uploader.onrender.com
+      - key: FACEBOOK_APP_ID
+        sync: false
+      - key: FACEBOOK_APP_SECRET
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+    healthCheckPath: /api/health
+    autoDeploy: true 

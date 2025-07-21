@@ -1,0 +1,622 @@
+2025-07-19 22:44:00:440 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-19 22:44:00:440 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-19 22:47:25:4725 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-19 22:47:25:4725 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-19 22:48:25:4825 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-19 22:48:25:4825 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-19 22:51:51:5151 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-19 22:51:51:5151 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-19 22:54:58:5458 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-19 22:54:58:5458 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 07:58:14:5814 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 07:58:14:5814 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 07:58:18:5818 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 07:58:18:5818 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 08:36:57:3657 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 08:36:57:3657 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 08:48:06:486 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 08:48:06:486 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 08:48:06:486 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 08:48:06:486 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 08:51:07:517 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 08:51:07:517 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 08:51:07:517 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 08:51:07:517 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 09:55:14:5514 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 09:55:14:5514 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 10:08:15:815 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 10:08:15:815 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 10:09:33:933 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:09:33:933 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:09:33:933 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:09:33:933 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:09:59:959 [32minfo[39m: [32mImage uploaded successfully[39m
+2025-07-20 10:10:16:1016 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:10:16:1016 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:10:16:1016 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:10:16:1016 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:12:52:1252 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:12:52:1252 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:12:52:1252 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:12:52:1252 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:13:12:1312 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:13:12:1312 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:13:12:1312 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:13:12:1312 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:13:34:1334 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:13:34:1334 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:13:34:1334 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:13:34:1334 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:13:42:1342 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:13:42:1342 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:13:42:1342 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:13:42:1342 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:13:54:1354 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:13:54:1354 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:13:54:1354 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:13:54:1354 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:14:41:1441 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:14:41:1441 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:14:41:1441 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:14:41:1441 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:14:52:1452 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:14:52:1452 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:14:52:1452 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:14:52:1452 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:15:01:151 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:15:01:151 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:15:01:151 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:15:01:151 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:17:38:1738 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:17:38:1738 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:17:38:1738 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:17:38:1738 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:47:40:4740 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:47:40:4740 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:47:40:4740 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:47:40:4740 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:47:43:4743 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:47:43:4743 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:47:43:4743 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:47:43:4743 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:48:41:4841 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 10:48:42:4842 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 10:48:49:4849 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:48:49:4849 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:48:49:4849 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:48:49:4849 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:49:34:4934 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:49:34:4934 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:49:34:4934 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:49:34:4934 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:50:17:5017 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 10:50:17:5017 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 10:50:17:5017 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 10:50:17:5017 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 10:50:31:5031 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 10:50:31:5031 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 10:50:42:5042 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 10:50:42:5042 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 11:08:39:839 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 11:08:39:839 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 11:08:47:847 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 11:08:47:847 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 11:09:15:915 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 11:09:15:915 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 11:09:47:947 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 11:09:47:947 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 11:16:15:1615 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 11:16:15:1615 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 11:16:15:1615 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 11:16:15:1615 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 11:35:19:3519 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 11:35:19:3519 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 11:35:19:3519 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 11:35:19:3519 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 11:35:25:3525 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 11:35:48:3548 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 11:35:53:3553 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 11:35:53:3553 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 11:35:53:3553 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 11:35:53:3553 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 11:52:49:5249 [32minfo[39m: [32mCreating new template[39m
+2025-07-20 11:52:49:5249 [32minfo[39m: [32mTemplate created successfully[39m
+2025-07-20 11:56:02:562 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 11:56:02:562 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 11:56:02:562 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 11:56:02:562 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 11:56:08:568 [32minfo[39m: [32mCreating new template[39m
+2025-07-20 11:56:08:568 [32minfo[39m: [32mTemplate created successfully[39m
+2025-07-20 11:57:23:5723 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 11:57:33:5733 [32minfo[39m: [32mCreating new template[39m
+2025-07-20 11:57:33:5733 [32minfo[39m: [32mTemplate created successfully[39m
+2025-07-20 11:57:54:5754 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 11:57:54:5754 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 11:57:54:5754 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 11:57:54:5754 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 11:58:15:5815 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 11:58:15:5815 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 11:58:15:5815 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 11:58:15:5815 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 11:58:34:5834 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 11:58:34:5834 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 11:58:34:5834 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 11:58:34:5834 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 11:58:45:5845 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 11:58:45:5845 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 11:58:45:5845 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 11:58:45:5845 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 11:58:54:5854 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 11:58:54:5854 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 11:58:54:5854 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 11:58:54:5854 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 11:59:01:591 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 11:59:01:591 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 11:59:01:591 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 11:59:01:591 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:01:20:120 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:01:20:120 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:01:20:120 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:01:20:120 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:01:32:132 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 12:01:39:139 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:01:39:139 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:01:39:139 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:01:39:139 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:02:22:222 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:02:22:222 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:02:33:233 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:02:33:233 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:02:33:233 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:02:33:233 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:02:41:241 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:02:41:241 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:02:41:241 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:02:41:241 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:02:53:253 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 12:03:07:37 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:03:07:37 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:03:07:37 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:03:07:37 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:03:14:314 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:03:14:314 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:03:14:314 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:03:14:314 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:03:22:322 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:03:22:322 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:03:22:322 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:03:22:322 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:03:30:330 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:03:30:330 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:03:30:330 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:03:30:330 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:03:39:339 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:03:39:339 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:03:39:339 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:03:39:339 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:03:48:348 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:03:48:348 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:03:48:348 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:03:48:348 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:04:05:45 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 12:04:08:48 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:04:08:48 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:04:08:48 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:04:08:48 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:04:19:419 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 12:05:53:553 [32minfo[39m: [32mCreating new template[39m
+2025-07-20 12:05:53:553 [32minfo[39m: [32mTemplate created successfully[39m
+2025-07-20 12:06:10:610 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:06:10:610 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:06:10:610 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:06:10:610 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:06:19:619 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:06:19:619 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:06:19:619 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:06:19:619 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:11:23:1123 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:11:23:1123 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:11:23:1123 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:11:23:1123 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:11:33:1133 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 12:12:06:126 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 12:12:18:1218 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:12:18:1218 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:12:18:1218 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:12:18:1218 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:13:34:1334 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:13:34:1334 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:13:34:1334 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:13:34:1334 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:13:46:1346 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:13:46:1346 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:13:46:1346 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:13:46:1346 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:14:09:149 [33mwarn[39m: [33mValidation failed[39m
+2025-07-20 12:14:14:1414 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:14:14:1414 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:14:14:1414 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:14:14:1414 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:14:47:1447 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:14:47:1447 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:14:47:1447 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:14:47:1447 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:14:54:1454 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:14:54:1454 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:14:54:1454 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:14:54:1454 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:15:00:150 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:15:00:150 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:15:00:150 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:15:00:150 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:15:07:157 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:15:07:157 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:15:07:157 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:15:07:157 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:15:19:1519 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:15:19:1519 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:15:19:1519 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:15:19:1519 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:15:29:1529 [32minfo[39m: [32mCreating new template[39m
+2025-07-20 12:15:29:1529 [32minfo[39m: [32mTemplate created successfully[39m
+2025-07-20 12:15:29:1529 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:15:29:1529 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:15:41:1541 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 12:15:49:1549 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:15:49:1549 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:15:49:1549 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:15:49:1549 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:46:40:4640 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:46:40:4640 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:46:40:4640 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:46:40:4640 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 12:53:12:5312 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 12:53:12:5312 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 12:53:12:5312 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 12:53:12:5312 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:15:23:1523 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:15:23:1523 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:15:23:1523 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:15:23:1523 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:16:15:1615 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:16:15:1615 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:16:15:1615 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:16:15:1615 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:16:27:1627 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:16:27:1627 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:16:27:1627 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:16:27:1627 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:16:37:1637 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:16:37:1637 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:16:37:1637 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:16:37:1637 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:16:50:1650 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:16:50:1650 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:16:50:1650 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:16:50:1650 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:28:04:284 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 13:34:01:341 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:34:01:341 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:34:01:341 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:34:01:341 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:34:32:3432 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:34:32:3432 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:34:32:3432 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:34:32:3432 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:34:48:3448 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:34:48:3448 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:34:48:3448 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:34:48:3448 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:34:59:3459 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:34:59:3459 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:34:59:3459 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:34:59:3459 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:37:38:3738 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:37:38:3738 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:37:38:3738 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:37:38:3738 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:38:09:389 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:38:09:389 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:38:09:389 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:38:09:389 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:38:16:3816 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:38:16:3816 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:38:16:3816 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:38:16:3816 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:38:24:3824 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:38:24:3824 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:38:24:3824 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:38:24:3824 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:39:16:3916 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:39:16:3916 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:39:16:3916 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:39:16:3916 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:39:24:3924 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:39:24:3924 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:39:24:3924 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:39:24:3924 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:39:51:3951 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:39:51:3951 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:39:51:3951 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:39:51:3951 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:45:07:457 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 13:45:11:4511 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:45:11:4511 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:45:11:4511 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:45:11:4511 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:45:22:4522 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:45:22:4522 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:45:22:4522 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:45:22:4522 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:46:13:4613 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:46:13:4613 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:46:13:4613 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:46:13:4613 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:46:54:4654 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:46:54:4654 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:46:54:4654 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:46:54:4654 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:47:14:4714 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:47:14:4714 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:47:14:4714 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:47:14:4714 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:48:42:4842 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:48:42:4842 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:48:42:4842 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:48:42:4842 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:48:47:4847 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:48:47:4847 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:48:47:4847 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:48:47:4847 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:49:12:4912 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:49:12:4912 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:49:12:4912 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:49:12:4912 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:49:16:4916 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:49:16:4916 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:49:16:4916 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:49:16:4916 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:49:32:4932 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:49:32:4932 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:49:32:4932 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:49:32:4932 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:50:08:508 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 13:50:35:5035 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:50:35:5035 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:50:35:5035 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:50:35:5035 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:51:52:5152 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:51:52:5152 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:51:52:5152 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:51:52:5152 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:55:29:5529 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:55:29:5529 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:55:29:5529 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:55:29:5529 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:55:37:5537 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:55:37:5537 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:55:37:5537 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:55:37:5537 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:56:06:566 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:56:06:566 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:56:06:566 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:56:06:566 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:56:26:5626 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:56:26:5626 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:56:26:5626 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:56:26:5626 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:56:32:5632 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:56:32:5632 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:56:32:5632 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:56:32:5632 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:57:38:5738 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 13:57:38:5738 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 13:57:38:5738 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 13:57:38:5738 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 13:59:29:5929 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 13:59:29:5929 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 14:32:18:3218 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:32:18:3218 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:32:18:3218 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:32:18:3218 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:50:38:5038 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:50:38:5038 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:50:38:5038 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:50:38:5038 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:50:40:5040 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:50:40:5040 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:50:40:5040 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:50:40:5040 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:53:59:5359 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:53:59:5359 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:53:59:5359 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:53:59:5359 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:54:08:548 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:54:08:548 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:54:08:548 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:54:08:548 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:54:42:5442 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:54:42:5442 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:54:42:5442 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:54:42:5442 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:55:02:552 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:55:02:552 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:55:02:552 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:55:02:552 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:55:11:5511 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:55:11:5511 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:55:11:5511 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:55:11:5511 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:55:17:5517 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:55:17:5517 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:55:17:5517 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:55:17:5517 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:55:23:5523 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:55:23:5523 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:55:23:5523 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:55:23:5523 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:55:25:5525 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:55:25:5525 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:55:25:5525 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:55:25:5525 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:55:36:5536 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:55:36:5536 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:55:36:5536 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:55:36:5536 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:58:24:5824 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:58:24:5824 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:58:24:5824 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:58:24:5824 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:58:24:5824 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:58:24:5824 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:58:24:5824 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:58:24:5824 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 14:58:38:5838 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 14:58:38:5838 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 14:58:38:5838 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 14:58:38:5838 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:00:18:018 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:00:18:018 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:00:18:018 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:00:18:018 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:00:25:025 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:00:25:025 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:00:26:026 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:00:26:026 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:01:50:150 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:01:50:150 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:01:50:150 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:01:50:150 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:01:54:154 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:01:54:154 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:01:54:154 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:01:54:154 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:02:08:28 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:02:08:28 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:02:08:28 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:02:08:28 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:02:30:230 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:02:30:230 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:02:30:230 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:02:30:230 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:03:51:351 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:03:51:351 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:03:51:351 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:03:51:351 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:10:19:1019 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:10:19:1019 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:10:19:1019 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:10:19:1019 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:16:40:1640 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:16:40:1640 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:16:40:1640 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:16:40:1640 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:16:49:1649 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:16:49:1649 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:16:49:1649 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:16:49:1649 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:17:46:1746 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:17:46:1746 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:17:46:1746 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:17:46:1746 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:17:53:1753 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:17:53:1753 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:17:53:1753 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:17:53:1753 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:22:03:223 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:22:03:223 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:22:03:223 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:22:03:223 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:22:53:2253 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:22:53:2253 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:22:53:2253 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:22:53:2253 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:23:01:231 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:23:01:231 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:23:01:231 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:23:01:231 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:23:09:239 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:23:09:239 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:23:09:239 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:23:09:239 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:23:24:2324 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:23:24:2324 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:23:24:2324 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:23:24:2324 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:23:42:2342 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:23:42:2342 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:23:42:2342 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:23:42:2342 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:24:07:247 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:24:07:247 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:24:07:247 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:24:07:247 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:27:43:2743 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:27:43:2743 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:27:43:2743 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:27:43:2743 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:28:30:2830 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 15:30:17:3017 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:30:17:3017 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:30:17:3017 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:30:17:3017 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:30:25:3025 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:30:25:3025 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:30:25:3025 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:30:25:3025 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:30:47:3047 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:30:47:3047 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:30:47:3047 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:30:47:3047 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:31:49:3149 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:31:49:3149 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:31:49:3149 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:31:49:3149 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:32:01:321 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:32:01:321 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:32:01:321 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:32:01:321 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:32:20:3220 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 15:32:20:3220 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 15:34:33:3433 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:34:33:3433 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:34:33:3433 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:34:33:3433 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:34:45:3445 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:34:45:3445 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:34:45:3445 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:34:45:3445 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:36:43:3643 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:36:43:3643 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:36:43:3643 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:36:43:3643 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:36:52:3652 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:36:52:3652 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:36:52:3652 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:36:52:3652 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:47:43:4743 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 15:47:43:4743 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 15:47:43:4743 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 15:47:43:4743 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 15:47:53:4753 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 15:47:53:4753 [32minfo[39m: [32mMedia uploaded successfully[39m
+2025-07-20 18:10:36:1036 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 18:10:36:1036 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 18:10:36:1036 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 18:10:36:1036 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 18:12:07:127 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 18:12:07:127 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 18:12:07:127 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 18:12:07:127 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 18:42:58:4258 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 18:42:58:4258 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 18:56:54:5654 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-20 18:56:54:5654 [32minfo[39m: [32mServer is running on port 3001[39m
+2025-07-20 19:12:03:123 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 19:12:03:123 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 19:12:03:123 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 19:12:03:123 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-20 20:40:34:4034 [32minfo[39m: [32mGetting templates[39m
+2025-07-20 20:40:34:4034 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-20 20:40:34:4034 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-20 20:40:34:4034 [32minfo[39m: [32mAll jobs retrieved[39m
