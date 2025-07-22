@@ -12,6 +12,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL ||
   (process.env.NODE_ENV === 'production' ? 'https://bulk-ads-uploader.onrender.com' : 'http://localhost:3001');
 
 console.log('API_BASE_URL:', API_BASE_URL);
+console.log('Build timestamp:', new Date().toISOString());
 
 // API Response Types
 interface ApiResponse<T = any> {

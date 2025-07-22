@@ -12,6 +12,14 @@
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>Facebook Ads Bulk Uploader</title>
+    <script>
+      // Debug environment variables in HTML
+      console.log('HTML Environment Check:', {
+        REACT_APP_API_URL: '%REACT_APP_API_URL%',
+        NODE_ENV: '%NODE_ENV%',
+        timestamp: new Date().toISOString()
+      });
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
