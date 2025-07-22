@@ -87,11 +87,32 @@ export interface Placement {
 export interface AdTemplate {
   id: string;
   name: string;
-  description: string;
+  adDescription?: string;
   adCopy: AdCopy;
-  targeting: Targeting;
-  budget: Budget;
+  targeting: {
+    ageMin?: number;
+    ageMax?: number;
+    locations?: {
+      inclusion?: string[];
+      exclusion?: string[];
+    };
+    interests?: string[];
+    customAudienceExclusion?: string[];
+    languages?: string[];
+  };
+  delivery?: {
+    accelerated?: boolean;
+    costPerResult?: number;
+    costPerResultCurrency?: 'USD' | 'EUR' | 'GBP' | 'CAD';
+  };
+  conversion?: {
+    conversionEvent?: any;
+    dataset?: any;
+  };
   placement: Placement;
+  specialAdCategories?: string[];
+  optimizationGoal?: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS';
+  billingEvent?: 'IMPRESSIONS' | 'LINK_CLICKS';
   createdAt: string;
   updatedAt: string;
 }
@@ -103,7 +124,10 @@ export interface CreateTemplateRequest {
   targeting: {
     ageMin: number;
     ageMax: number;
-    locations: any[];
+    locations: {
+      inclusion: string[];
+      exclusion: string[];
+    };
     interests: string[];
   };
   delivery: {
@@ -201,15 +225,52 @@ class ApiClient {
     };
 
     try {
-      const response = await fetch(url, config);
-      const data = await response.json();
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(url, {
+        ...config,
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        throw new Error(data.message || `HTTP ${response.status}`);
+      // Handle different response types
+      if (response.headers.get('content-type')?.includes('application/json')) {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          console.error('Backend error response:', JSON.stringify(data, null, 2));
+          throw new Error(data.message || data.error || `HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        return data;
+      } else {
+        // Handle non-JSON responses
+        const text = await response.text();
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${text || response.statusText}`);
+        }
+        throw new Error('Expected JSON response but received non-JSON data');
       }
-
-      return data;
     } catch (error) {
+      // Enhanced error handling
+      if (error instanceof TypeError && (error as Error).message.includes('fetch')) {
+        console.error('Network error - server may be down:', error);
+        throw new Error('Unable to connect to server. Please check if the backend is running.');
+      }
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error('Request timeout:', error);
+        throw new Error('Request timed out. Please try again.');
+      }
+      
+      if (error instanceof Error && error.message.includes('Failed to fetch')) {
+        console.error('CORS or connection error:', error);
+        throw new Error('Connection failed. Please check your network and server status.');
+      }
+      
       console.error('API request failed:', error);
       throw error;
     }

@@ -35,8 +35,9 @@ export class FacebookAdService {
   private mapTemplateToCampaign(template: EnhancedAdTemplate): FacebookCampaignData {
     return {
       name: template.name,
-      objective: 'LINK_CLICKS', // Default objective, can be made configurable
+      objective: 'OUTCOME_TRAFFIC', // Default objective, can be made configurable
       status: 'PAUSED', // Always create in paused status for safety
+      special_ad_categories: template.specialAdCategories || [], // Required by Facebook API
     };
   }
 
@@ -45,22 +46,246 @@ export class FacebookAdService {
     template: EnhancedAdTemplate,
     campaignId: string,
     adSetName: string,
-    budget: number
+    budget: number,
+    bidStrategy?: 'LOWEST_COST_WITHOUT_CAP' | 'LOWEST_COST_WITH_BID_CAP' | 'COST_CAP' | 'BID_CAP' | 'ABSOLUTE_OCPM',
+    bidAmount?: number
   ): FacebookAdSetData {
+    // Convert locations to modern format (EnhancedTargeting uses string arrays)
+    const geoLocations = template.targeting.locations?.inclusion?.length > 0 ? {
+      countries: template.targeting.locations.inclusion.map(countryCode => ({
+        key: countryCode,
+        name: countryCode // In a real app, you'd have a mapping of country codes to names
+      }))
+    } : undefined;
+
+    // Convert custom audience exclusions to modern format
+    const excludedCustomAudiences = template.targeting.customAudienceExclusion?.length > 0 ? 
+      template.targeting.customAudienceExclusion.map(audienceId => ({ id: audienceId })) : undefined;
+
+    // Build targeting object with only defined values
+    const targeting: any = {
+      // Basic demographics - these are required
+      age_min: template.targeting.ageMin || 18,
+      age_max: template.targeting.ageMax || 65,
+    };
+
+    // Only add geo_locations if we have valid data
+    if (geoLocations) {
+      targeting.geo_locations = geoLocations;
+    }
+
+    // Only add excluded_custom_audiences if we have valid data
+    if (excludedCustomAudiences) {
+      targeting.excluded_custom_audiences = excludedCustomAudiences;
+    }
+
+    // Only add interests if we have valid data
+    if (template.targeting.interests?.length > 0) {
+      targeting.interests = template.targeting.interests.map(interestId => ({ 
+        id: interestId, 
+        name: interestId 
+      }));
+    }
+
+    // Only add behaviors if we have valid data
+    if (template.targeting.behaviors?.length > 0) {
+      targeting.behaviors = template.targeting.behaviors.map(behaviorId => ({ 
+        id: behaviorId, 
+        name: behaviorId 
+      }));
+    }
+
+    // Only add demographics if we have valid data
+    if (template.targeting.demographics) {
+      const demographics: any = {};
+      
+      if (template.targeting.demographics.educationStatuses?.length > 0) {
+        demographics.education_statuses = template.targeting.demographics.educationStatuses;
+      }
+      
+      if (template.targeting.demographics.relationshipStatuses?.length > 0) {
+        demographics.relationship_statuses = template.targeting.demographics.relationshipStatuses;
+      }
+      
+      if (template.targeting.demographics.income?.length > 0) {
+        demographics.income = template.targeting.demographics.income.map(incomeId => ({ 
+          id: incomeId, 
+          name: incomeId 
+        }));
+      }
+      
+      if (template.targeting.demographics.lifeEvents?.length > 0) {
+        demographics.life_events = template.targeting.demographics.lifeEvents.map(eventId => ({ 
+          id: eventId, 
+          name: eventId 
+        }));
+      }
+      
+      if (Object.keys(demographics).length > 0) {
+        targeting.demographics = demographics;
+      }
+    }
+
+    // Only add exclusions if we have valid data
+    if (template.targeting.exclusions) {
+      const exclusions: any = {};
+      
+      if (template.targeting.exclusions.interests?.length > 0) {
+        exclusions.interests = template.targeting.exclusions.interests.map(interestId => ({ 
+          id: interestId, 
+          name: interestId 
+        }));
+      }
+      
+      if (template.targeting.exclusions.behaviors?.length > 0) {
+        exclusions.behaviors = template.targeting.exclusions.behaviors.map(behaviorId => ({ 
+          id: behaviorId, 
+          name: behaviorId 
+        }));
+      }
+      
+      if (template.targeting.exclusions.demographics) {
+        const exclusionDemographics: any = {};
+        
+        if (template.targeting.exclusions.demographics.educationStatuses?.length > 0) {
+          exclusionDemographics.education_statuses = template.targeting.exclusions.demographics.educationStatuses;
+        }
+        
+        if (template.targeting.exclusions.demographics.relationshipStatuses?.length > 0) {
+          exclusionDemographics.relationship_statuses = template.targeting.exclusions.demographics.relationshipStatuses;
+        }
+        
+        if (Object.keys(exclusionDemographics).length > 0) {
+          exclusions.demographics = exclusionDemographics;
+        }
+      }
+      
+      if (Object.keys(exclusions).length > 0) {
+        targeting.exclusions = exclusions;
+      }
+    }
+
+    // Only add device_platforms if we have valid data
+    if (template.targeting.devicePlatforms?.length > 0) {
+      // Convert to Facebook's expected format
+      const devicePlatforms = template.targeting.devicePlatforms.map(platform => {
+        switch (platform) {
+          case 'desktop': return 'desktop';
+          case 'mobile': return 'mobile';
+          case 'connected_tv': return 'connected_tv';
+          default: return 'desktop';
+        }
+      });
+      targeting.device_platforms = devicePlatforms;
+    }
+
+    // Only add locales if we have valid data
+    if (template.targeting.languages?.length > 0) {
+      targeting.locales = template.targeting.languages.map(lang => {
+        // Convert language codes to Facebook locale IDs
+        const localeMap: { [key: string]: number } = {
+          'en': 1033, // English (US)
+          'es': 1034, // Spanish
+          'fr': 1036, // French
+          'de': 1031, // German
+          'it': 1040, // Italian
+          'pt': 1046, // Portuguese
+          'ja': 1041, // Japanese
+          'ko': 1042, // Korean
+          'zh': 1028, // Chinese (Traditional)
+          'ar': 1025, // Arabic
+        };
+        return localeMap[lang] || 1033; // Default to English
+      });
+    }
+
+    // Only add publisher_platforms if we have valid data
+    if (template.placement.facebook || template.placement.instagram) {
+      const platforms = [];
+      if (template.placement.facebook) platforms.push('facebook');
+      if (template.placement.instagram) platforms.push('instagram');
+      if (platforms.length > 0) {
+        targeting.publisher_platforms = platforms;
+      }
+    }
+
+    // Add geo_locations with a default country if none specified
+    if (!geoLocations) {
+      targeting.geo_locations = {
+        countries: ['US']
+      };
+    } else {
+      targeting.geo_locations = geoLocations;
+    }
+
     return {
       name: adSetName,
       campaign_id: campaignId,
-      daily_budget: budget * 100, // Convert to cents
-      billing_event: 'IMPRESSIONS',
-      optimization_goal: 'LINK_CLICKS',
-      targeting: {
-        age_min: template.targeting.ageMin,
-        age_max: template.targeting.ageMax,
-        geo_locations: {
-          countries: template.targeting.locations.inclusion || [],
-        },
-      },
+      daily_budget: Math.max(budget * 100, 100), // Convert to cents, minimum 100 cents ($1.00)
+      billing_event: template.billingEvent || 'IMPRESSIONS',
+      optimization_goal: template.optimizationGoal || 'LINK_CLICKS',
+      bid_strategy: bidStrategy || 'LOWEST_COST_WITHOUT_CAP',
+      bid_amount: bidAmount ? bidAmount * 100 : undefined, // Convert to cents
+      targeting,
       status: 'PAUSED', // Always create in paused status for safety
+      special_ad_categories: template.specialAdCategories || [],
+    };
+  }
+
+  // Validate template and ad items before creating ads
+  private validateBulkAdsData(
+    template: EnhancedAdTemplate,
+    adItems: BulkAdItem[],
+    pageId: string
+  ): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    // Validate template required fields
+    if (!template.adCopy.primaryText?.trim()) {
+      errors.push('Template primary text is required for all ads');
+    }
+    if (!template.adCopy.headline?.trim()) {
+      errors.push('Template headline is required for all ads');
+    }
+    if (!template.adCopy.callToAction?.trim()) {
+      errors.push('Template call to action is required for all ads');
+    }
+
+    // Validate each ad item
+    adItems.forEach((adItem, index) => {
+      const adNumber = index + 1;
+      
+      // Validate media requirements
+      if (adItem.mediaType === 'video') {
+        if (!adItem.facebookMediaId?.trim()) {
+          errors.push(`Ad ${adNumber} (${adItem.filename}): Video ID is required for video ads`);
+        }
+      } else if (adItem.mediaType === 'image') {
+        if (!adItem.facebookMediaHash?.trim()) {
+          errors.push(`Ad ${adNumber} (${adItem.filename}): Image hash is required for image ads`);
+        }
+      }
+
+      // Validate ad-specific required fields
+      if (!adItem.adName?.trim()) {
+        errors.push(`Ad ${adNumber} (${adItem.filename}): Ad name is required`);
+      }
+      if (!adItem.adSetName?.trim()) {
+        errors.push(`Ad ${adNumber} (${adItem.filename}): Ad set name is required`);
+      }
+      if (!adItem.budget || adItem.budget <= 0) {
+        errors.push(`Ad ${adNumber} (${adItem.filename}): Valid budget is required`);
+      }
+    });
+
+    // Validate page ID
+    if (!pageId?.trim()) {
+      errors.push('Facebook page ID is required for ad creatives');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
     };
   }
 
@@ -70,24 +295,101 @@ export class FacebookAdService {
     adItem: BulkAdItem,
     pageId: string
   ): FacebookCreativeData {
-    const linkData = {
-      message: template.adCopy.primaryText,
-      link: 'https://your-website.com', // This should be configurable
-      call_to_action: {
-        type: template.adCopy.callToAction || 'LEARN_MORE',
-        value: {
-          link: 'https://your-website.com',
-        },
-      },
-    };
+    // Debug: Log the template data being used
+    console.log('🔍 Creating creative with template data:', {
+      templateName: template.name,
+      primaryText: template.adCopy.primaryText,
+      headline: template.adCopy.headline,
+      callToAction: template.adCopy.callToAction,
+      adItemMediaType: adItem.mediaType,
+      facebookMediaId: adItem.facebookMediaId,
+      facebookMediaHash: adItem.facebookMediaHash
+    });
 
-    return {
-      name: `${adItem.adName} Creative`,
-      object_story_spec: {
-        page_id: pageId,
-        link_data: linkData,
-      },
-    };
+    // Ensure required fields are present (validation should have caught this, but double-check)
+    if (!template.adCopy.primaryText?.trim()) {
+      throw new Error('Primary text is required for ad creative');
+    }
+    if (!template.adCopy.headline?.trim()) {
+      throw new Error('Headline is required for ad creative');
+    }
+    if (!template.adCopy.callToAction?.trim()) {
+      throw new Error('Call to action is required for ad creative');
+    }
+
+    // Check if we have uploaded media
+    if (adItem.facebookMediaHash || adItem.facebookMediaId) {
+      // Create media-based creative
+      if (adItem.mediaType === 'video') {
+        const videoId = adItem.facebookMediaId;
+        if (!videoId) {
+          throw new Error(`No video ID found for ${adItem.filename}`);
+        }
+        
+        // For video creatives, ensure all required fields are present
+        const videoCreative = {
+          name: `${adItem.adName} Creative`,
+          object_story_spec: {
+            page_id: pageId,
+            video_data: {
+              video_id: videoId,
+              message: template.adCopy.primaryText,
+              call_to_action: {
+                type: template.adCopy.callToAction as 'SHOP_NOW' | 'LEARN_MORE' | 'SIGN_UP' | 'BOOK_NOW' | 'CONTACT_US',
+                value: {
+                  link: 'https://your-website.com', // This should be configurable
+                },
+              },
+            },
+          },
+        };
+        
+        // Debug: Log the exact creative data being sent
+        console.log('🔍 Creating video creative with data:', JSON.stringify(videoCreative, null, 2));
+        
+        return videoCreative;
+      } else {
+        // Create image-based creative
+        return {
+          name: `${adItem.adName} Creative`,
+          object_story_spec: {
+            page_id: pageId,
+            link_data: {
+              image_hash: adItem.facebookMediaHash,
+              message: template.adCopy.primaryText,
+              link: 'https://your-website.com', // This should be configurable
+              name: template.adCopy.headline,
+              call_to_action: {
+                type: template.adCopy.callToAction as 'SHOP_NOW' | 'LEARN_MORE' | 'SIGN_UP' | 'BOOK_NOW' | 'CONTACT_US',
+                value: {
+                  link: 'https://your-website.com',
+                },
+              },
+            },
+          },
+        };
+      }
+    } else {
+      // Fallback to link-based creative if no media
+      const linkData = {
+        message: template.adCopy.primaryText,
+        link: 'https://your-website.com', // This should be configurable
+        call_to_action: {
+          type: template.adCopy.callToAction as 'SHOP_NOW' | 'LEARN_MORE' | 'SIGN_UP' | 'BOOK_NOW' | 'CONTACT_US',
+          value: {
+            link: 'https://your-website.com',
+          },
+        },
+      };
+
+      return {
+        name: `${adItem.adName} Creative`,
+        object_story_spec: {
+          page_id: pageId,
+          link_data: linkData,
+        },
+      };
+    }
   }
 
   // Map ad item to Facebook ad data
@@ -148,7 +450,8 @@ export class FacebookAdService {
     adAccountId: string,
     pageId: string,
     budget: number,
-    onProgress?: (progress: number, message: string) => void
+    onProgress?: (progress: number, message: string) => void,
+    existingCampaignId?: string
   ): Promise<BulkAdCreationResult> {
     const result: BulkAdCreationResult = {
       campaignId: '',
@@ -158,6 +461,16 @@ export class FacebookAdService {
       errors: [],
       previewUrls: [],
     };
+
+    // Validate all data before proceeding
+    onProgress?.(5, 'Validating ad data...');
+    const validation = this.validateBulkAdsData(template, adItems, pageId);
+    
+    if (!validation.isValid) {
+      result.errors = validation.errors;
+      onProgress?.(100, 'Validation failed - please fix the errors');
+      return result;
+    }
 
     // In development mode, use mock creation
     if (this.isDevelopmentMode) {
@@ -200,14 +513,18 @@ export class FacebookAdService {
     }
 
     try {
-      onProgress?.(10, 'Creating campaign...');
-      
-      // 1. Create campaign
-      const campaignData = this.mapTemplateToCampaign(template);
-      const campaignResult = await this.apiClient.createCampaign(adAccountId, campaignData);
-      result.campaignId = campaignResult.id;
-
-      onProgress?.(20, 'Campaign created successfully');
+      // 1. Use existing campaign or create new one
+      if (existingCampaignId) {
+        onProgress?.(10, 'Using existing campaign...');
+        result.campaignId = existingCampaignId;
+        onProgress?.(20, 'Using existing campaign');
+      } else {
+        onProgress?.(10, 'Creating campaign...');
+        const campaignData = this.mapTemplateToCampaign(template);
+        const campaignResult = await this.apiClient.createCampaign(adAccountId, campaignData);
+        result.campaignId = campaignResult.id;
+        onProgress?.(20, 'Campaign created successfully');
+      }
 
       // 2. Create ad sets and ads for each ad item
       const totalSteps = adItems.length * 3; // ad set + creative + ad for each item
@@ -224,8 +541,14 @@ export class FacebookAdService {
             template,
             result.campaignId,
             adItem.adSetName,
-            budget
+            budget,
+            adItem.bidStrategy,
+            adItem.bidAmount
           );
+          
+          // Debug: Log the ad set data being sent to Facebook
+          console.log('🔍 Creating ad set with data:', JSON.stringify(adSetData, null, 2));
+          
           const adSetResult = await this.apiClient.createAdSet(adAccountId, adSetData);
           result.adSetIds.push(adSetResult.id);
           completedSteps++;
@@ -234,6 +557,10 @@ export class FacebookAdService {
           
           // Create creative
           const creativeData = this.mapTemplateToCreative(template, adItem, pageId);
+          
+          // Debug: Log the creative data being sent to Facebook
+          console.log('🔍 Creating creative with data:', JSON.stringify(creativeData, null, 2));
+          
           const creativeResult = await this.apiClient.createAdCreative(adAccountId, creativeData);
           result.creativeIds.push(creativeResult.id);
           completedSteps++;

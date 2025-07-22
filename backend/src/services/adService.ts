@@ -126,16 +126,14 @@ export class AdService {
       // Create ad set if requested
       if (request.options.createAdSet && campaignId) {
         try {
-          // Ensure budget amount is a number
-          const budgetAmount = typeof template.budget.amount === 'string' 
-            ? parseFloat(template.budget.amount) 
-            : template.budget.amount;
+          // Use delivery settings for budget (default to 10 if not specified)
+          const budgetAmount = template.delivery?.costPerResult || 10;
 
           adSetId = await facebookService.createAdSet(
             campaignId,
             request.adSetName,
             template.targeting,
-            { ...template.budget, amount: budgetAmount },
+            { amount: budgetAmount, currency: template.delivery?.costPerResultCurrency || 'USD', type: 'DAILY' },
             request.options.status
           );
           job.results.adSetId = adSetId;

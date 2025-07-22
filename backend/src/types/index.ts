@@ -66,16 +66,24 @@ export interface AdCopy {
 export interface Targeting {
   ageMin?: number;
   ageMax?: number;
-  genders?: ('all' | 'men' | 'women')[];
-  locations?: string[];
+  locations?: {
+    inclusion?: string[];
+    exclusion?: string[];
+  };
   interests?: string[];
-  customAudiences?: string[];
+  customAudienceExclusion?: string[];
+  languages?: string[];
 }
 
-export interface Budget {
-  amount: number | string;
-  currency: 'USD' | 'EUR' | 'GBP' | 'CAD';
-  type: 'DAILY' | 'LIFETIME';
+export interface DeliverySettings {
+  accelerated?: boolean;
+  costPerResult?: number;
+  costPerResultCurrency?: 'USD' | 'EUR' | 'GBP' | 'CAD';
+}
+
+export interface ConversionSettings {
+  conversionEvent?: any;
+  dataset?: any;
 }
 
 export interface Placement {
@@ -87,31 +95,43 @@ export interface Placement {
 export interface AdTemplate {
   id: string;
   name: string;
-  description: string;
+  adDescription?: string;
   adCopy: AdCopy;
   targeting: Targeting;
-  budget: Budget;
+  delivery?: DeliverySettings;
+  conversion?: ConversionSettings;
   placement: Placement;
+  specialAdCategories?: string[];
+  optimizationGoal?: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS';
+  billingEvent?: 'IMPRESSIONS' | 'LINK_CLICKS';
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface CreateTemplateRequest {
   name: string;
-  description?: string;
+  adDescription?: string;
   adCopy: AdCopy;
   targeting: Targeting;
-  budget: Budget;
+  delivery?: DeliverySettings;
+  conversion?: ConversionSettings;
   placement: Placement;
+  specialAdCategories?: string[];
+  optimizationGoal?: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS';
+  billingEvent?: 'IMPRESSIONS' | 'LINK_CLICKS';
 }
 
 export interface UpdateTemplateRequest {
   name?: string;
-  description?: string;
+  adDescription?: string;
   adCopy?: AdCopy;
   targeting?: Targeting;
-  budget?: Budget;
+  delivery?: DeliverySettings;
+  conversion?: ConversionSettings;
   placement?: Placement;
+  specialAdCategories?: string[];
+  optimizationGoal?: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS';
+  billingEvent?: 'IMPRESSIONS' | 'LINK_CLICKS';
 }
 
 export interface PaginationInfo {

@@ -1,11 +1,5 @@
-import { useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.REACT_APP_SUPABASE_URL!,
-  process.env.REACT_APP_SUPABASE_ANON_KEY!
-);
+import React, { useEffect } from 'react';
+import supabase from '../lib/supabase';
 
 interface RealTimeSubscriptionProps {
   currentJobId: string | null;

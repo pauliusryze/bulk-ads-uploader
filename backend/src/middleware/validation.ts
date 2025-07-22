@@ -22,7 +22,7 @@ export const facebookAuthSchema = Joi.object({
   })
 });
 
-// Template Schema
+// Template Schema - Updated to match frontend structure
 export const templateSchema = Joi.object({
   name: Joi.string().min(1).max(100).required().messages({
     'string.empty': 'Template name is required',
@@ -30,7 +30,7 @@ export const templateSchema = Joi.object({
     'string.max': 'Template name must be less than 100 characters',
     'any.required': 'Template name is required'
   }),
-  description: Joi.string().max(500).optional().messages({
+  adDescription: Joi.string().max(500).optional().messages({
     'string.max': 'Description must be less than 500 characters'
   }),
   adCopy: Joi.object({
@@ -62,38 +62,31 @@ export const templateSchema = Joi.object({
       'number.min': 'Maximum age must be at least 13',
       'number.max': 'Maximum age must be 65 or less'
     }),
-    genders: Joi.array().items(Joi.string().valid('all', 'men', 'women')).optional(),
-    locations: Joi.array().items(Joi.string().min(2).max(10)).optional().messages({
-      'array.max': 'Maximum 10 locations allowed'
-    }),
-    interests: Joi.array().items(Joi.string().min(1).max(50)).optional().messages({
-      'array.max': 'Maximum 50 interests allowed'
-    }),
-    customAudiences: Joi.array().items(Joi.string()).optional()
+    locations: Joi.object({
+      inclusion: Joi.array().items(Joi.string()).optional(),
+      exclusion: Joi.array().items(Joi.string()).optional()
+    }).optional(),
+    interests: Joi.array().items(Joi.string()).optional(),
+    customAudienceExclusion: Joi.array().items(Joi.string()).optional(),
+    languages: Joi.array().items(Joi.string()).optional()
   }).required(),
-  budget: Joi.object({
-    amount: Joi.alternatives().try(
-      Joi.number().min(1).required(),
-      Joi.string().pattern(/^\d+(\.\d+)?$/).required()
-    ).messages({
-      'number.min': 'Budget amount must be at least 1',
-      'string.pattern.base': 'Budget amount must be a valid number',
-      'any.required': 'Budget amount is required'
-    }),
-    currency: Joi.string().valid('USD', 'EUR', 'GBP', 'CAD').required().messages({
-      'any.only': 'Currency must be USD, EUR, GBP, or CAD',
-      'any.required': 'Currency is required'
-    }),
-    type: Joi.string().valid('DAILY', 'LIFETIME').required().messages({
-      'any.only': 'Budget type must be DAILY or LIFETIME',
-      'any.required': 'Budget type is required'
-    })
-  }).required(),
+  delivery: Joi.object({
+    accelerated: Joi.boolean().optional(),
+    costPerResult: Joi.number().optional(),
+    costPerResultCurrency: Joi.string().valid('USD', 'EUR', 'GBP', 'CAD').optional()
+  }).optional(),
+  conversion: Joi.object({
+    conversionEvent: Joi.any().optional(),
+    dataset: Joi.any().optional()
+  }).optional(),
   placement: Joi.object({
     facebook: Joi.boolean().required(),
     instagram: Joi.boolean().required(),
     audienceNetwork: Joi.boolean().required()
-  }).required()
+  }).required(),
+  specialAdCategories: Joi.array().items(Joi.string()).optional(),
+  optimizationGoal: Joi.string().valid('LINK_CLICKS', 'CONVERSIONS', 'REACH', 'BRAND_AWARENESS', 'VIDEO_VIEWS').optional(),
+  billingEvent: Joi.string().valid('IMPRESSIONS', 'LINK_CLICKS').optional()
 });
 
 // Bulk Ad Creation Schema

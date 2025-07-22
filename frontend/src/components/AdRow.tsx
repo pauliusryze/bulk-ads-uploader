@@ -110,6 +110,40 @@ export function AdRow({ ad, campaigns, facebookPages, instagramPages, pixels, te
             />
           </div>
 
+          {/* Bid Strategy */}
+          <div className="space-y-2">
+            <Label>Bid Strategy</Label>
+            <select
+              value={ad.bidStrategy || 'LOWEST_COST_WITHOUT_CAP'}
+              onChange={(e) => handleFieldChange('bidStrategy', e.target.value)}
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="LOWEST_COST_WITHOUT_CAP">Lowest Cost (Recommended)</option>
+              <option value="LOWEST_COST_WITH_BID_CAP">Lowest Cost with Bid Cap</option>
+              <option value="COST_CAP">Cost Cap</option>
+              <option value="BID_CAP">Bid Cap</option>
+              <option value="ABSOLUTE_OCPM">Absolute oCPM</option>
+            </select>
+          </div>
+
+          {/* Bid Amount - Only show for strategies that need it */}
+          {(ad.bidStrategy === 'LOWEST_COST_WITH_BID_CAP' || 
+            ad.bidStrategy === 'COST_CAP' || 
+            ad.bidStrategy === 'BID_CAP' || 
+            ad.bidStrategy === 'ABSOLUTE_OCPM') && (
+            <div className="space-y-2">
+              <Label>Bid Amount</Label>
+              <Input
+                type="number"
+                value={ad.bidAmount || ''}
+                onChange={(e) => handleFieldChange('bidAmount', e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+              />
+            </div>
+          )}
+
           {/* Start Date */}
           <div className="space-y-2">
             <Label>Start Date</Label>

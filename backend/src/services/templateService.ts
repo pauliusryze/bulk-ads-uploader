@@ -31,26 +31,18 @@ export class TemplateService {
       const templateId = uuidv4();
       const now = new Date();
 
-      // Ensure budget amount is a number
-      const budgetAmount = typeof data.budget.amount === 'string' 
-        ? parseFloat(data.budget.amount) 
-        : data.budget.amount;
-
-      if (isNaN(budgetAmount) || budgetAmount <= 0) {
-        throw new AppError('Invalid budget amount. Must be a positive number.', 400);
-      }
-
       const template: AdTemplate = {
         id: templateId,
         name: data.name,
-        description: data.description || '',
+        adDescription: data.adDescription || '',
         adCopy: data.adCopy,
         targeting: data.targeting,
-        budget: {
-          ...data.budget,
-          amount: budgetAmount
-        },
+        delivery: data.delivery,
+        conversion: data.conversion,
         placement: data.placement,
+        specialAdCategories: data.specialAdCategories || [],
+        optimizationGoal: data.optimizationGoal || 'LINK_CLICKS',
+        billingEvent: data.billingEvent || 'IMPRESSIONS',
         createdAt: now,
         updatedAt: now
       };
@@ -85,7 +77,7 @@ export class TemplateService {
         const searchLower = search.toLowerCase();
         templates = templates.filter(template => 
           template.name.toLowerCase().includes(searchLower) ||
-          template.description.toLowerCase().includes(searchLower)
+          (template.adDescription && template.adDescription.toLowerCase().includes(searchLower))
         );
       }
 
@@ -169,11 +161,15 @@ export class TemplateService {
       const updatedTemplate: AdTemplate = {
         ...existingTemplate,
         name: data.name ?? existingTemplate.name,
-        description: data.description ?? existingTemplate.description,
+        adDescription: data.adDescription ?? existingTemplate.adDescription,
         adCopy: data.adCopy ?? existingTemplate.adCopy,
         targeting: data.targeting ?? existingTemplate.targeting,
-        budget: data.budget ?? existingTemplate.budget,
+        delivery: data.delivery ?? existingTemplate.delivery,
+        conversion: data.conversion ?? existingTemplate.conversion,
         placement: data.placement ?? existingTemplate.placement,
+        specialAdCategories: data.specialAdCategories ?? existingTemplate.specialAdCategories,
+        optimizationGoal: data.optimizationGoal ?? existingTemplate.optimizationGoal,
+        billingEvent: data.billingEvent ?? existingTemplate.billingEvent,
         updatedAt: new Date()
       };
 

@@ -7,6 +7,8 @@ export interface BulkAdItem {
   mediaType: 'image' | 'video';
   filename: string;
   thumbnailUrl: string;
+  facebookMediaHash?: string; // Facebook media hash for creatives
+  facebookMediaId?: string; // Facebook media ID
   campaignId: string;
   campaignName: string;
   adSetName: string;
@@ -19,6 +21,8 @@ export interface BulkAdItem {
   advantagePlusEnhancements: AdvantagePlusEnhancements;
   pixelId: string;
   urlParams: string;
+  bidStrategy: 'LOWEST_COST_WITHOUT_CAP' | 'LOWEST_COST_WITH_BID_CAP' | 'COST_CAP' | 'BID_CAP' | 'ABSOLUTE_OCPM';
+  bidAmount?: number;
 }
 
 // Facebook Campaign Interface
@@ -149,6 +153,24 @@ export interface EnhancedTargeting {
   ageMax?: number;
   customAudienceExclusion: string[];
   languages: string[];
+  interests: string[];
+  behaviors: string[];
+  demographics: {
+    educationStatuses: number[];
+    relationshipStatuses: number[];
+    income: string[];
+    lifeEvents: string[];
+    selectedDemographics: Array<{ id: string; name: string; category: string; type: string }>;
+  };
+  exclusions: {
+    interests: string[];
+    behaviors: string[];
+    demographics: {
+      educationStatuses: number[];
+      relationshipStatuses: number[];
+    };
+  };
+  devicePlatforms: ('desktop' | 'mobile' | 'connected_tv')[];
 }
 
 // Placement Controls Interface
@@ -170,6 +192,9 @@ export interface EnhancedAdTemplate {
   delivery: DeliverySettings;
   conversion: ConversionSettings;
   placement: Placement;
+  specialAdCategories: string[]; // NEW FIELD
+  optimizationGoal: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS' | 'OUTCOME_TRAFFIC' | 'OUTCOME_ENGAGEMENT' | 'OUTCOME_LEADS' | 'OUTCOME_SALES' | 'OUTCOME_APP_PROMOTION'; // NEW FIELD
+  billingEvent: 'IMPRESSIONS' | 'LINK_CLICKS'; // NEW FIELD
   createdAt: string;
   updatedAt: string;
 }
@@ -183,6 +208,9 @@ export interface CreateEnhancedTemplateRequest {
   delivery: DeliverySettings;
   conversion: ConversionSettings;
   placement: Placement;
+  specialAdCategories: string[]; // NEW FIELD
+  optimizationGoal: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS'; // NEW FIELD
+  billingEvent: 'IMPRESSIONS' | 'LINK_CLICKS'; // NEW FIELD
 }
 
 // Facebook Location Interface
@@ -212,4 +240,20 @@ export interface DeliverySettings {
 export interface ConversionSettings {
   conversionEvent: FacebookConversionEvent | null;
   dataset: FacebookDataset | null;
+} 
+
+export interface AdTemplate {
+  id: string;
+  name: string;
+  adDescription: string;
+  adCopy: AdCopy;
+  targeting: EnhancedTargeting;
+  delivery: DeliverySettings;
+  conversion: ConversionSettings;
+  placement: Placement;
+  specialAdCategories: string[];
+  optimizationGoal: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS';
+  billingEvent: 'IMPRESSIONS' | 'LINK_CLICKS';
+  createdAt: string;
+  updatedAt: string;
 } 
