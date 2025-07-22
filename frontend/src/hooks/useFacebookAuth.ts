@@ -138,6 +138,24 @@ export const useFacebookAuth = () => {
       });
 
       setApiClient(client);
+      
+      // Test basic connectivity first (independent of Facebook API)
+      console.log('🔍 Testing basic internet connectivity...');
+      const basicConnectivityTest = await client.testBasicConnectivity();
+      if (!basicConnectivityTest.connected) {
+        console.error('❌ Basic connectivity test failed:', basicConnectivityTest.error);
+        throw new Error(`Internet connectivity issue: ${basicConnectivityTest.error}`);
+      }
+      console.log('✅ Basic connectivity test successful');
+      
+      // Test connection before fetching data
+      console.log('🔍 Testing Facebook API connection...');
+      const connectionTest = await client.testConnection();
+      if (!connectionTest.connected) {
+        console.error('❌ Connection test failed:', connectionTest.error);
+        throw new Error(`Facebook API connection failed: ${connectionTest.error}`);
+      }
+      console.log('✅ Connection test successful');
 
       // Get user's ad accounts and pages
       const [adAccountsResponse, pagesResponse] = await Promise.all([
@@ -354,12 +372,21 @@ export const useFacebookAuth = () => {
       
       setApiClient(client);
       
+      // Test basic connectivity first (independent of Facebook API)
+      console.log('🔍 Testing basic internet connectivity...');
+      const basicConnectivityTest = await client.testBasicConnectivity();
+      if (!basicConnectivityTest.connected) {
+        console.error('❌ Basic connectivity test failed:', basicConnectivityTest.error);
+        throw new Error(`Internet connectivity issue: ${basicConnectivityTest.error}`);
+      }
+      console.log('✅ Basic connectivity test successful');
+      
       // Test connection before fetching data
       console.log('🔍 Testing Facebook API connection...');
       const connectionTest = await client.testConnection();
       if (!connectionTest.connected) {
         console.error('❌ Connection test failed:', connectionTest.error);
-        throw new Error(`Connection test failed: ${connectionTest.error}`);
+        throw new Error(`Facebook API connection failed: ${connectionTest.error}`);
       }
       console.log('✅ Connection test successful');
       

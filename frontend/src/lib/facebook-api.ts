@@ -403,31 +403,53 @@ class FacebookAPIClient {
           console.error('❌ Network connectivity issue detected');
           console.log('🔍 Attempting to diagnose connection...');
           
-          // Test basic internet connectivity
+          // Test basic internet connectivity (independent of Facebook API)
           try {
-            await fetch('https://httpbin.org/get', { 
+            const connectivityResponse = await fetch('https://httpbin.org/get', { 
               method: 'GET', 
               mode: 'cors',
               signal: AbortSignal.timeout(5000)
             });
-            console.log('✅ Basic internet connectivity: OK');
             
-            // Test Facebook domain accessibility
-            try {
-              await fetch('https://graph.facebook.com/me?access_token=test', { 
-                method: 'GET', 
-                mode: 'cors',
-                signal: AbortSignal.timeout(5000)
-              });
-              console.log('✅ Facebook API domain: Accessible');
-            } catch (fbError) {
-              console.warn('⚠️ Facebook API domain test failed:', fbError);
+            if (connectivityResponse.ok) {
+              console.log('✅ Basic internet connectivity: OK');
+              
+              // Test Facebook domain accessibility (without using our API client)
+              try {
+                const fbResponse = await fetch('https://graph.facebook.com/v23.0/me?access_token=test', { 
+                  method: 'GET', 
+                  mode: 'cors',
+                  signal: AbortSignal.timeout(5000)
+                });
+                
+                if (fbResponse.status === 400) {
+                  // 400 is expected with invalid token, means domain is accessible
+                  console.log('✅ Facebook API domain: Accessible');
+                  throw new Error('Facebook API is accessible but authentication failed. Please check your access token.');
+                } else if (fbResponse.ok) {
+                  console.log('✅ Facebook API domain: Accessible');
+                  throw new Error('Facebook API is accessible but there was an issue with your request. Please try again.');
+                } else {
+                  console.warn('⚠️ Facebook API domain test failed:', fbResponse.status, fbResponse.statusText);
+                  throw new Error('Facebook API appears to be temporarily unavailable. Please try again in a few moments.');
+                }
+              } catch (fbError) {
+                if (fbError instanceof Error && fbError.message.includes('Failed to fetch')) {
+                  console.error('❌ Facebook API domain: Not accessible');
+                  throw new Error('Unable to reach Facebook API servers. Please check your internet connection and try again.');
+                }
+                throw fbError; // Re-throw specific Facebook errors
+              }
+            } else {
+              console.error('❌ Internet connectivity test failed:', connectivityResponse.status);
+              throw new Error('Internet connectivity issue detected. Please check your internet connection.');
             }
-            
-            throw new Error('Network error: Unable to connect to Facebook API. This might be a CORS issue or Facebook API is temporarily unavailable. Please try again in a few moments.');
           } catch (connectivityError) {
             console.error('❌ Internet connectivity test failed:', connectivityError);
-            throw new Error('Network error: Unable to connect to Facebook API. Please check your internet connection and try again.');
+            if (connectivityError instanceof Error && connectivityError.message.includes('Failed to fetch')) {
+              throw new Error('Network error: Unable to connect to external services. Please check your internet connection and try again.');
+            }
+            throw connectivityError;
           }
         }
         
@@ -550,13 +572,43 @@ class FacebookAPIClient {
     return { success: true, message: 'Mock response' } as T;
   }
 
+  // Test basic internet connectivity (independent of Facebook API)
+  async testBasicConnectivity(): Promise<{ connected: boolean; error?: string }> {
+    try {
+      console.log('🔍 Testing basic internet connectivity...');
+      
+      const response = await fetch('https://httpbin.org/get', { 
+        method: 'GET', 
+        mode: 'cors',
+        signal: AbortSignal.timeout(5000)
+      });
+      
+      if (response.ok) {
+        console.log('✅ Basic internet connectivity: OK');
+        return { connected: true };
+      } else {
+        console.error('❌ Basic connectivity test failed:', response.status);
+        return { 
+          connected: false, 
+          error: `HTTP ${response.status}: ${response.statusText}`
+        };
+      }
+    } catch (error) {
+      console.error('❌ Basic connectivity test failed:', error);
+      return { 
+        connected: false, 
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
   // Test Facebook API connectivity
   async testConnection(): Promise<{ connected: boolean; error?: string }> {
     try {
       console.log('🔍 Testing Facebook API connectivity...');
       
-      // Test basic Facebook API access
-      const response = await this.request('/me?fields=id,name', {
+      // Test basic Facebook API access with a simple endpoint
+      const response = await this.request('/me?fields=id', {
         method: 'GET',
       });
       
@@ -564,6 +616,8 @@ class FacebookAPIClient {
       return { connected: true };
     } catch (error) {
       console.error('❌ Facebook API connection failed:', error);
+      
+      // Don't trigger the network diagnostics here to avoid circular dependency
       return { 
         connected: false, 
         error: error instanceof Error ? error.message : 'Unknown error'
