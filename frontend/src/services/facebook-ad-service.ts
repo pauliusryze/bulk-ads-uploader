@@ -295,28 +295,6 @@ export class FacebookAdService {
     adItem: BulkAdItem,
     pageId: string
   ): FacebookCreativeData {
-    // Debug: Log the template data being used
-    console.log('🔍 Creating creative with template data:', {
-      templateName: template.name,
-      primaryText: template.adCopy.primaryText,
-      headline: template.adCopy.headline,
-      callToAction: template.adCopy.callToAction,
-      adItemMediaType: adItem.mediaType,
-      facebookMediaId: adItem.facebookMediaId,
-      facebookMediaHash: adItem.facebookMediaHash
-    });
-
-    // Ensure required fields are present (validation should have caught this, but double-check)
-    if (!template.adCopy.primaryText?.trim()) {
-      throw new Error('Primary text is required for ad creative');
-    }
-    if (!template.adCopy.headline?.trim()) {
-      throw new Error('Headline is required for ad creative');
-    }
-    if (!template.adCopy.callToAction?.trim()) {
-      throw new Error('Call to action is required for ad creative');
-    }
-
     // Check if we have uploaded media
     if (adItem.facebookMediaHash || adItem.facebookMediaId) {
       // Create media-based creative
@@ -333,11 +311,12 @@ export class FacebookAdService {
             page_id: pageId,
             video_data: {
               video_id: videoId,
-              message: template.adCopy.primaryText,
+              message: template.adCopy.primaryText || 'Primary Text',
+              title: template.adCopy.headline || 'Ad Headline',
               call_to_action: {
-                type: template.adCopy.callToAction as 'SHOP_NOW' | 'LEARN_MORE' | 'SIGN_UP' | 'BOOK_NOW' | 'CONTACT_US',
+                type: template.adCopy.callToAction || 'LEARN_MORE',
                 value: {
-                  link: 'https://your-website.com', // This should be configurable
+                  link: 'https://your-website.com',
                 },
               },
             },
@@ -356,11 +335,11 @@ export class FacebookAdService {
             page_id: pageId,
             link_data: {
               image_hash: adItem.facebookMediaHash,
-              message: template.adCopy.primaryText,
-              link: 'https://your-website.com', // This should be configurable
-              name: template.adCopy.headline,
+              message: template.adCopy.primaryText || 'Primary Text',
+              link: 'https://your-website.com',
+              name: template.adCopy.headline || 'Ad Headline',
               call_to_action: {
-                type: template.adCopy.callToAction as 'SHOP_NOW' | 'LEARN_MORE' | 'SIGN_UP' | 'BOOK_NOW' | 'CONTACT_US',
+                type: template.adCopy.callToAction || 'LEARN_MORE',
                 value: {
                   link: 'https://your-website.com',
                 },
@@ -372,10 +351,10 @@ export class FacebookAdService {
     } else {
       // Fallback to link-based creative if no media
       const linkData = {
-        message: template.adCopy.primaryText,
-        link: 'https://your-website.com', // This should be configurable
+        message: template.adCopy.primaryText || 'Primary Text',
+        link: 'https://your-website.com',
         call_to_action: {
-          type: template.adCopy.callToAction as 'SHOP_NOW' | 'LEARN_MORE' | 'SIGN_UP' | 'BOOK_NOW' | 'CONTACT_US',
+          type: template.adCopy.callToAction || 'LEARN_MORE',
           value: {
             link: 'https://your-website.com',
           },
