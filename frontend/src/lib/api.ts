@@ -7,7 +7,9 @@ console.log('Environment variables:', {
   REACT_APP_NODE_ENV: process.env.REACT_APP_NODE_ENV
 });
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+// Temporary fix: Hardcode production URL if environment variable is not available
+const API_BASE_URL = process.env.REACT_APP_API_URL || 
+  (process.env.NODE_ENV === 'production' ? 'https://bulk-ads-uploader.onrender.com' : 'http://localhost:3001');
 
 console.log('API_BASE_URL:', API_BASE_URL);
 
