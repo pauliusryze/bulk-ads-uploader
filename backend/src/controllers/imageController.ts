@@ -102,7 +102,11 @@ export const uploadImages = async (req: Request, res: Response): Promise<void> =
     }
 
     const response: UploadResponse = {
-      uploadedImages,
+      uploadedMedia: uploadedImages.map(img => ({
+        ...img,
+        mediaType: 'image' as const,
+        uploadedAt: img.uploadedAt.toISOString()
+      })),
       totalUploaded: uploadedImages.length,
       failedUploads
     };

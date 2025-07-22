@@ -6886,3 +6886,37 @@
 2025-07-21 23:20:21:2021 [32minfo[39m: [32mAll jobs retrieved[39m
 2025-07-21 23:20:26:2026 [32minfo[39m: [32mGetting all jobs[39m
 2025-07-21 23:20:26:2026 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-21 23:34:45:3445 [32minfo[39m: [32mGetting templates[39m
+2025-07-21 23:34:45:3445 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-21 23:34:45:3445 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-21 23:34:45:3445 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-21 23:34:50:3450 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-21 23:34:50:3450 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-21 23:35:04:354 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-21 23:35:04:354 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-21 23:52:18:5218 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-21 23:52:18:5218 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-21 23:52:18:5218 [32minfo[39m: [32mGetting templates[39m
+2025-07-21 23:52:18:5218 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-21 23:52:26:5226 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-21 23:52:26:5226 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-21 23:52:31:5231 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-21 23:52:31:5231 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-22 00:45:46:4546 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-22 00:45:46:4546 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-22 00:45:46:4546 [32minfo[39m: [32mGetting templates[39m
+2025-07-22 00:45:46:4546 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-22 07:12:38:1238 [32minfo[39m: [32mGetting templates[39m
+2025-07-22 07:12:38:1238 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-22 07:12:38:1238 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-22 07:12:38:1238 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-22 09:04:30:430 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-22 09:04:30:430 [32minfo[39m: [32mHTTPS Server is running on port 3001[39m
+2025-07-22 09:04:42:442 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-22 09:04:42:442 [32minfo[39m: [32mHTTPS Server is running on port 3001[39m
+2025-07-22 09:10:02:102 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-22 09:10:02:102 [32minfo[39m: [32mHTTPS Server is running on port 3001[39m
+2025-07-22 09:10:13:1013 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-22 09:10:13:1013 [32minfo[39m: [32mHTTPS Server is running on port 3001[39m
+2025-07-22 09:10:28:1028 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-22 09:10:28:1028 [32minfo[39m: [32mHTTPS Server is running on port 3001[39m

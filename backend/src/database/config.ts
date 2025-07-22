@@ -22,10 +22,13 @@ const supabase: SupabaseClient = createClient(supabaseUrl, supabaseServiceKey, {
 });
 
 // Test database connection
-supabase.from('users').select('count').limit(1).then(() => {
-  logger.info('Connected to Supabase database');
-}).catch((error) => {
-  logger.error('Failed to connect to Supabase', error);
-});
+(async () => {
+  try {
+    await supabase.from('users').select('count').limit(1);
+    logger.info('Connected to Supabase database');
+  } catch (error) {
+    logger.error('Failed to connect to Supabase', error);
+  }
+})();
 
 export default supabase; 
