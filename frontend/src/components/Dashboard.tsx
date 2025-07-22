@@ -185,7 +185,8 @@ function DashboardContent() {
         addVideoEffects: false
       },
       pixelId: '',
-      urlParams: ''
+      urlParams: '',
+      landingPageUrl: 'https://your-website.com' // NEW: Default landing page URL
     } as MassApplyOptions
   });
 
@@ -299,6 +300,7 @@ function DashboardContent() {
             startDate: null,
             facebookPageId: '',
             instagramPageId: '',
+            landingPageUrl: 'https://your-website.com', // NEW: Default landing page URL
             mediaSetup: {
               type: 'manual' as const,
               label: 'Manual upload',
@@ -2630,14 +2632,13 @@ function DashboardContent() {
                     </Select>
                   </div>
 
-                  {/* Budget - Required */}
+                  {/* Budget - Mass Apply */}
                   <div className="space-y-2">
-                    <Label htmlFor="budget" className="flex items-center gap-1">
-                      Daily Budget (USD) <span className="text-red-500">*</span>
-                      <span className="text-xs text-muted-foreground">(minimum $1.00)</span>
+                    <Label className="flex items-center gap-1">
+                      Daily Budget <span className="text-red-500">*</span>
+                      <span className="text-xs text-muted-foreground">(per ad, minimum $1.00)</span>
                     </Label>
                     <Input
-                      id="budget"
                       type="number"
                       min="1"
                       step="0.01"
@@ -2661,6 +2662,34 @@ function DashboardContent() {
                     </div>
                   </div>
 
+                  {/* Landing Page URL - Mass Apply */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-1">
+                      Landing Page URL <span className="text-red-500">*</span>
+                      <span className="text-xs text-muted-foreground">(where ads will lead)</span>
+                    </Label>
+                    <Input
+                      type="url"
+                      placeholder="https://your-website.com"
+                      value={bulkAdsForm.massApplyOptions.landingPageUrl || ''}
+                      onChange={(e) => setBulkAdsForm(prev => ({
+                        ...prev,
+                        massApplyOptions: { 
+                          ...prev.massApplyOptions, 
+                          landingPageUrl: e.target.value 
+                        }
+                      }))}
+                      className={!bulkAdsForm.massApplyOptions.landingPageUrl ? "border-red-300" : ""}
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>
+                        {bulkAdsForm.massApplyOptions.landingPageUrl ? 
+                          "✓ Valid URL" : "Required for ad creation"}
+                      </span>
+                      <span>Destination for ad clicks</span>
+                    </div>
+                  </div>
+
                   {/* Apply to All Button */}
                   <div className="flex gap-2">
                     <Button
@@ -2676,7 +2705,8 @@ function DashboardContent() {
                             campaignName: campaigns.find(c => c.id === prev.massApplyOptions.campaignId)?.name || '',
                             facebookPageId: prev.massApplyOptions.facebookPageId || '',
                             instagramPageId: (prev.massApplyOptions.instagramPageId === "none" || !prev.massApplyOptions.instagramPageId) ? '' : prev.massApplyOptions.instagramPageId,
-                            budget: prev.massApplyOptions.budget || 0
+                            budget: prev.massApplyOptions.budget || 0,
+                            landingPageUrl: prev.massApplyOptions.landingPageUrl || 'https://your-website.com'
                           }))
                         }));
                         toast({
@@ -2684,7 +2714,7 @@ function DashboardContent() {
                           description: `Updated ${bulkAdsForm.adItems.length} ads`,
                         });
                       }}
-                      disabled={!bulkAdsForm.massApplyOptions.campaignId || !bulkAdsForm.massApplyOptions.facebookPageId || !bulkAdsForm.massApplyOptions.budget}
+                      disabled={!bulkAdsForm.massApplyOptions.campaignId || !bulkAdsForm.massApplyOptions.facebookPageId || !bulkAdsForm.massApplyOptions.budget || !bulkAdsForm.massApplyOptions.landingPageUrl}
                     >
                       Apply Settings to All {bulkAdsForm.adItems.length} Ads
                     </Button>
@@ -2720,6 +2750,9 @@ function DashboardContent() {
                       </div>
                       <div className={`flex items-center gap-2 ${bulkAdsForm.massApplyOptions.budget && bulkAdsForm.massApplyOptions.budget >= 1 ? 'text-green-600' : 'text-red-500'}`}>
                         {bulkAdsForm.massApplyOptions.budget && bulkAdsForm.massApplyOptions.budget >= 1 ? '✅' : '❌'} Valid Budget (${bulkAdsForm.massApplyOptions.budget || 0}/day per ad)
+                      </div>
+                      <div className={`flex items-center gap-2 ${bulkAdsForm.massApplyOptions.landingPageUrl ? 'text-green-600' : 'text-red-500'}`}>
+                        {bulkAdsForm.massApplyOptions.landingPageUrl ? '✅' : '❌'} Landing Page URL Set
                       </div>
                       <div className={`flex items-center gap-2 ${isAuthenticated && selectedAdAccount ? 'text-green-600' : 'text-red-500'}`}>
                         {isAuthenticated && selectedAdAccount ? '✅' : '❌'} Facebook Account Connected
@@ -2906,6 +2939,25 @@ function DashboardContent() {
 
                               {/* Advanced Settings */}
                               <div className="space-y-3">
+                                {/* Landing Page URL */}
+                                <div className="space-y-1">
+                                  <Label className="text-xs font-medium">Landing Page URL <span className="text-red-500">*</span></Label>
+                                  <Input
+                                    type="url"
+                                    value={item.landingPageUrl}
+                                    onChange={(e) => {
+                                      setBulkAdsForm(prev => ({
+                                        ...prev,
+                                        adItems: prev.adItems.map(ad => 
+                                          ad.id === item.id ? { ...ad, landingPageUrl: e.target.value } : ad
+                                        )
+                                      }));
+                                    }}
+                                    placeholder="https://your-website.com"
+                                    className="text-xs"
+                                  />
+                                </div>
+
                                 {/* URL Parameters */}
                                 <div className="space-y-1">
                                   <Label className="text-xs font-medium">URL Parameters</Label>
@@ -2923,61 +2975,61 @@ function DashboardContent() {
                                     className="text-xs"
                                   />
                                 </div>
-
-                                {/* Advantage+ Creative Enhancements */}
-                                <div className="space-y-2">
-                                  <Label className="text-xs font-medium">Advantage+ Creative</Label>
-                                  <div className="space-y-1">
-                                    {[
-                                      { key: 'translateText', label: 'Translate text' },
-                                      { key: 'showProducts', label: 'Show products' },
-                                      { key: 'visualTouchUps', label: 'Visual touch-ups' },
-                                      { key: 'textImprovements', label: 'Text improvements' },
-                                      { key: 'enhanceCTA', label: 'Enhance CTA' },
-                                      { key: 'addVideoEffects', label: 'Add video effects' }
-                                    ].map((enhancement) => (
-                                      <label key={enhancement.key} className="flex items-center space-x-2">
-                                        <input
-                                          type="checkbox"
-                                          checked={item.advantagePlusEnhancements[enhancement.key as keyof typeof item.advantagePlusEnhancements]}
-                                          onChange={(e) => {
-                                            setBulkAdsForm(prev => ({
-                                              ...prev,
-                                              adItems: prev.adItems.map(ad => 
-                                                ad.id === item.id ? {
-                                                  ...ad,
-                                                  advantagePlusEnhancements: {
-                                                    ...ad.advantagePlusEnhancements,
-                                                    [enhancement.key]: e.target.checked
-                                                  }
-                                                } : ad
-                                              )
-                                            }));
-                                          }}
-                                          className="rounded"
-                                        />
-                                        <span className="text-xs">{enhancement.label}</span>
-                                      </label>
-                                    ))}
-                                  </div>
-                                </div>
-
-                                {/* Remove Ad Button */}
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() => {
-                                    setBulkAdsForm(prev => ({
-                                      ...prev,
-                                      adItems: prev.adItems.filter(ad => ad.id !== item.id),
-                                      uploadedMedia: prev.uploadedMedia.filter(media => media.id !== item.mediaId)
-                                    }));
-                                  }}
-                                  className="w-full text-xs"
-                                >
-                                  Remove Ad
-                                </Button>
                               </div>
+
+                              {/* Advantage+ Creative Enhancements */}
+                              <div className="space-y-2">
+                                <Label className="text-xs font-medium">Advantage+ Creative</Label>
+                                <div className="space-y-1">
+                                  {[
+                                    { key: 'translateText', label: 'Translate text' },
+                                    { key: 'showProducts', label: 'Show products' },
+                                    { key: 'visualTouchUps', label: 'Visual touch-ups' },
+                                    { key: 'textImprovements', label: 'Text improvements' },
+                                    { key: 'enhanceCTA', label: 'Enhance CTA' },
+                                    { key: 'addVideoEffects', label: 'Add video effects' }
+                                  ].map((enhancement) => (
+                                    <label key={enhancement.key} className="flex items-center space-x-2">
+                                      <input
+                                        type="checkbox"
+                                        checked={item.advantagePlusEnhancements[enhancement.key as keyof typeof item.advantagePlusEnhancements]}
+                                        onChange={(e) => {
+                                          setBulkAdsForm(prev => ({
+                                            ...prev,
+                                            adItems: prev.adItems.map(ad => 
+                                              ad.id === item.id ? {
+                                                ...ad,
+                                                advantagePlusEnhancements: {
+                                                  ...ad.advantagePlusEnhancements,
+                                                  [enhancement.key]: e.target.checked
+                                                }
+                                              } : ad
+                                            )
+                                          }));
+                                        }}
+                                        className="rounded"
+                                      />
+                                      <span className="text-xs">{enhancement.label}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Remove Ad Button */}
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  setBulkAdsForm(prev => ({
+                                    ...prev,
+                                    adItems: prev.adItems.filter(ad => ad.id !== item.id),
+                                    uploadedMedia: prev.uploadedMedia.filter(media => media.id !== item.mediaId)
+                                  }));
+                                }}
+                                className="w-full text-xs"
+                              >
+                                Remove Ad
+                              </Button>
                             </div>
                           </div>
                         ))}
@@ -3011,13 +3063,14 @@ function DashboardContent() {
                         !bulkAdsForm.massApplyOptions.facebookPageId ||
                         !bulkAdsForm.massApplyOptions.budget ||
                         bulkAdsForm.massApplyOptions.budget < 1 ||
+                        !bulkAdsForm.massApplyOptions.landingPageUrl ||
                         !isAuthenticated || 
                         !selectedAdAccount
                       }
                       className="flex-1"
                     >
                       {createEnhancedBulkAds.isPending ? 'Creating Ads...' : 
-                       (!bulkAdsForm.templateId || bulkAdsForm.adItems.length === 0 || !bulkAdsForm.massApplyOptions.campaignId || !bulkAdsForm.massApplyOptions.facebookPageId || !bulkAdsForm.massApplyOptions.budget || bulkAdsForm.massApplyOptions.budget < 1 || !isAuthenticated || !selectedAdAccount) ?
+                       (!bulkAdsForm.templateId || bulkAdsForm.adItems.length === 0 || !bulkAdsForm.massApplyOptions.campaignId || !bulkAdsForm.massApplyOptions.facebookPageId || !bulkAdsForm.massApplyOptions.budget || bulkAdsForm.massApplyOptions.budget < 1 || !bulkAdsForm.massApplyOptions.landingPageUrl || !isAuthenticated || !selectedAdAccount) ?
                        'Complete Required Fields' : `Create ${bulkAdsForm.adItems.length} Bulk Ads`}
                     </Button>
                   </div>

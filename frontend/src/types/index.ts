@@ -17,6 +17,7 @@ export interface BulkAdItem {
   startDate: Date | null;
   facebookPageId: string;
   instagramPageId: string;
+  landingPageUrl: string; // NEW: Landing page URL for ads
   mediaSetup: MediaSetupOption;
   advantagePlusEnhancements: AdvantagePlusEnhancements;
   pixelId: string;
@@ -76,6 +77,7 @@ export interface MassApplyOptions {
   startDate?: Date | null;
   facebookPageId?: string;
   instagramPageId?: string;
+  landingPageUrl?: string; // NEW: Landing page URL for mass apply
   mediaSetup?: MediaSetupOption;
   advantagePlusEnhancements?: AdvantagePlusEnhancements;
   pixelId?: string;

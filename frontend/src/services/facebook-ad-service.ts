@@ -304,18 +304,20 @@ export class FacebookAdService {
           throw new Error(`No video ID found for ${adItem.filename}`);
         }
         
-        // For video creatives, use video_data (not link_data)
+        // For video creatives, use link_data with video_id (correct Facebook API format)
         const videoCreative = {
           name: `${adItem.adName} Creative`,
           object_story_spec: {
             page_id: pageId,
-            video_data: {
+            link_data: {
               video_id: videoId,
               message: template.adCopy.primaryText || 'Primary Text',
+              link: adItem.landingPageUrl || 'https://your-website.com',
+              name: template.adCopy.headline || 'Ad Headline',
               call_to_action: {
                 type: template.adCopy.callToAction || 'LEARN_MORE',
                 value: {
-                  link: 'https://your-website.com',
+                  link: adItem.landingPageUrl || 'https://your-website.com',
                 },
               },
             },
@@ -335,12 +337,12 @@ export class FacebookAdService {
             link_data: {
               image_hash: adItem.facebookMediaHash,
               message: template.adCopy.primaryText || 'Primary Text',
-              link: 'https://your-website.com',
+              link: adItem.landingPageUrl || 'https://your-website.com',
               name: template.adCopy.headline || 'Ad Headline',
               call_to_action: {
                 type: template.adCopy.callToAction || 'LEARN_MORE',
                 value: {
-                  link: 'https://your-website.com',
+                  link: adItem.landingPageUrl || 'https://your-website.com',
                 },
               },
             },
@@ -351,11 +353,11 @@ export class FacebookAdService {
       // Fallback to link-based creative if no media
       const linkData = {
         message: template.adCopy.primaryText || 'Primary Text',
-        link: 'https://your-website.com',
+        link: adItem.landingPageUrl || 'https://your-website.com',
         call_to_action: {
           type: template.adCopy.callToAction || 'LEARN_MORE',
           value: {
-            link: 'https://your-website.com',
+            link: adItem.landingPageUrl || 'https://your-website.com',
           },
         },
       };
