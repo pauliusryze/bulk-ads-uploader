@@ -1,6 +1,15 @@
 import { FacebookCampaign, FacebookPage, EnhancedBulkAdRequest } from '../types';
 
+// Debug environment variables
+console.log('Environment variables:', {
+  REACT_APP_API_URL: process.env.REACT_APP_API_URL,
+  NODE_ENV: process.env.NODE_ENV,
+  REACT_APP_NODE_ENV: process.env.REACT_APP_NODE_ENV
+});
+
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
+console.log('API_BASE_URL:', API_BASE_URL);
 
 // API Response Types
 interface ApiResponse<T = any> {
