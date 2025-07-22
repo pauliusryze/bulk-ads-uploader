@@ -304,15 +304,16 @@ export class FacebookAdService {
           throw new Error(`No video ID found for ${adItem.filename}`);
         }
         
-        // For video creatives, ensure all required fields are present
+        // For video creatives, use link_data with video_id (not video_data)
         const videoCreative = {
           name: `${adItem.adName} Creative`,
           object_story_spec: {
             page_id: pageId,
-            video_data: {
+            link_data: {
               video_id: videoId,
               message: template.adCopy.primaryText || 'Primary Text',
-              title: template.adCopy.headline || 'Ad Headline',
+              link: 'https://your-website.com',
+              name: template.adCopy.headline || 'Ad Headline',
               call_to_action: {
                 type: template.adCopy.callToAction || 'LEARN_MORE',
                 value: {

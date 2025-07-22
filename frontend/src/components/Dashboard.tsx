@@ -1290,7 +1290,7 @@ function DashboardContent() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Basic Template Info */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="templateName">Template Name</Label>
                   <Input
@@ -1299,27 +1299,6 @@ function DashboardContent() {
                     onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
                     placeholder="Enter template name"
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="callToAction">Call to Action</Label>
-                  <Select 
-                    value={templateForm.adCopy.callToAction}
-                    onValueChange={(value) => setTemplateForm({ 
-                      ...templateForm, 
-                      adCopy: { ...templateForm.adCopy, callToAction: value as any }
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select call to action" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="SHOP_NOW">Shop Now</SelectItem>
-                      <SelectItem value="LEARN_MORE">Learn More</SelectItem>
-                      <SelectItem value="SIGN_UP">Sign Up</SelectItem>
-                      <SelectItem value="BOOK_NOW">Book Now</SelectItem>
-                      <SelectItem value="CONTACT_US">Contact Us</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
               
