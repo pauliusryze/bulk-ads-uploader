@@ -7,11 +7,10 @@ console.log('Environment variables:', {
   REACT_APP_NODE_ENV: process.env.REACT_APP_NODE_ENV
 });
 
-// Temporary fix: Hardcode production URL if environment variable is not available
-const API_BASE_URL = process.env.REACT_APP_API_URL || 
-  (process.env.NODE_ENV === 'production' ? 'https://bulk-ads-uploader.onrender.com' : 'http://localhost:3001');
+// TEMPORARY FIX: Hardcode production URL to bypass env var issues
+const API_BASE_URL = 'https://bulk-ads-uploader.onrender.com';
 
-console.log('API_BASE_URL:', API_BASE_URL);
+console.log('API_BASE_URL (hardcoded):', API_BASE_URL);
 console.log('Build timestamp:', new Date().toISOString());
 
 // API Response Types
