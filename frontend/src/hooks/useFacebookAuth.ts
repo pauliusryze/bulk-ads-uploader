@@ -354,6 +354,15 @@ export const useFacebookAuth = () => {
       
       setApiClient(client);
       
+      // Test connection before fetching data
+      console.log('🔍 Testing Facebook API connection...');
+      const connectionTest = await client.testConnection();
+      if (!connectionTest.connected) {
+        console.error('❌ Connection test failed:', connectionTest.error);
+        throw new Error(`Connection test failed: ${connectionTest.error}`);
+      }
+      console.log('✅ Connection test successful');
+      
       console.log('🔍 Fetching ad accounts and pages...');
       
       // Get user's ad accounts and pages

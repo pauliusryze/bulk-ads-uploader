@@ -189,6 +189,23 @@ class FacebookAPIClient {
     }
 
     const url = `${this.baseUrl}${endpoint}`;
+    
+    // Validate access token
+    if (!this.config.accessToken) {
+      throw new Error('No access token provided. Please authenticate with Facebook first.');
+    }
+    
+    if (this.config.accessToken.length < 20) {
+      throw new Error('Invalid access token format. Please re-authenticate with Facebook.');
+    }
+    
+    // Log token info for debugging (safely)
+    console.log('🔑 Access Token Info:', {
+      length: this.config.accessToken.length,
+      prefix: this.config.accessToken.substring(0, 10) + '...',
+      type: this.config.accessToken.startsWith('EAA') ? 'User Token' : 'Unknown'
+    });
+    
     const params = new URLSearchParams({
       access_token: this.config.accessToken,
     });
@@ -368,15 +385,61 @@ class FacebookAPIClient {
     } catch (error) {
       // Handle network errors and timeouts
       if (error instanceof Error) {
+        console.error('❌ Network/Request Error Details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          url: fullUrl,
+          method: config.method,
+          timestamp: new Date().toISOString()
+        });
+        
         if (error.name === 'AbortError') {
-          throw new Error('Request timeout: The request took too long to complete.');
+          throw new Error('Request timeout: The request took too long to complete. Please try again.');
         }
+        
         if (error.message.includes('Failed to fetch')) {
-          throw new Error('Network error: Unable to connect to Facebook API. Please check your internet connection.');
+          // More specific network error handling
+          console.error('❌ Network connectivity issue detected');
+          console.log('🔍 Attempting to diagnose connection...');
+          
+          // Test basic internet connectivity
+          try {
+            await fetch('https://httpbin.org/get', { 
+              method: 'GET', 
+              mode: 'cors',
+              signal: AbortSignal.timeout(5000)
+            });
+            console.log('✅ Basic internet connectivity: OK');
+            
+            // Test Facebook domain accessibility
+            try {
+              await fetch('https://graph.facebook.com/me?access_token=test', { 
+                method: 'GET', 
+                mode: 'cors',
+                signal: AbortSignal.timeout(5000)
+              });
+              console.log('✅ Facebook API domain: Accessible');
+            } catch (fbError) {
+              console.warn('⚠️ Facebook API domain test failed:', fbError);
+            }
+            
+            throw new Error('Network error: Unable to connect to Facebook API. This might be a CORS issue or Facebook API is temporarily unavailable. Please try again in a few moments.');
+          } catch (connectivityError) {
+            console.error('❌ Internet connectivity test failed:', connectivityError);
+            throw new Error('Network error: Unable to connect to Facebook API. Please check your internet connection and try again.');
+          }
         }
+        
+        if (error.message.includes('TypeError: NetworkError') || 
+            error.message.includes('CORS') ||
+            error.message.includes('blocked')) {
+          throw new Error('CORS error: This might be due to browser security restrictions. Please ensure you\'re accessing the app from the correct domain.');
+        }
+        
         throw error;
       }
-      throw new Error('Unknown error occurred');
+      throw new Error('Unknown network error occurred');
     }
   }
 
@@ -487,52 +550,96 @@ class FacebookAPIClient {
     return { success: true, message: 'Mock response' } as T;
   }
 
-  // Get user's ad accounts
-  async getAdAccounts(): Promise<{ data: FacebookAdAccount[] }> {
-    const result = await this.request<{ data: FacebookAdAccount[] }>('/me/adaccounts?fields=id,name,currency,timezone,account_status,business', {
-      method: 'GET',
-    });
-    
-    // Validate the response structure
-    if (!result || !result.data || !Array.isArray(result.data)) {
-      console.error('❌ Invalid ad accounts response:', result);
-      throw new Error('Failed to fetch ad accounts - invalid response format');
-    }
-    
-    // Check for sandbox accounts and warn
-    result.data.forEach((account, index) => {
-      // Validate account object
-      if (!account) {
-        console.warn(`⚠️ Null account at index ${index}`);
-        return;
-      }
+  // Test Facebook API connectivity
+  async testConnection(): Promise<{ connected: boolean; error?: string }> {
+    try {
+      console.log('🔍 Testing Facebook API connectivity...');
       
-      console.log('🔍 Ad Account Details:', {
-        id: account.id,
-        name: account.name,
-        currency: account.currency,
-        timezone: account.timezone,
-        business_name: account.business_name,
-        account_status: account.account_status
+      // Test basic Facebook API access
+      const response = await this.request('/me?fields=id,name', {
+        method: 'GET',
       });
       
-      // Check if it's a sandbox account (usually has specific naming patterns)
-      // Add null/undefined checks to prevent errors
-      const accountName = account.name || '';
-      const accountId = account.id || '';
+      console.log('✅ Facebook API connection successful:', response);
+      return { connected: true };
+    } catch (error) {
+      console.error('❌ Facebook API connection failed:', error);
+      return { 
+        connected: false, 
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  // Get user's ad accounts
+  async getAdAccounts(): Promise<{ data: FacebookAdAccount[] }> {
+    try {
+      console.log('🚀 Fetching ad accounts...');
       
-      if (accountName.toLowerCase().includes('sandbox') || 
-          accountId.includes('sandbox') ||
-          accountName.toLowerCase().includes('test')) {
-        console.warn('⚠️ SANDBOX ACCOUNT DETECTED:', accountName);
-        console.warn('⚠️ Sandbox accounts have limitations:');
-        console.warn('   - Cannot create real ads');
-        console.warn('   - Limited API endpoints');
-        console.warn('   - For testing only');
+      const result = await this.request<{ data: FacebookAdAccount[] }>('/me/adaccounts?fields=id,name,currency,timezone,account_status,business', {
+        method: 'GET',
+      });
+      
+      // Validate the response structure
+      if (!result || !result.data || !Array.isArray(result.data)) {
+        console.error('❌ Invalid ad accounts response:', result);
+        throw new Error('Failed to fetch ad accounts - invalid response format');
       }
-    });
-    
-    return result;
+      
+      console.log(`✅ Successfully fetched ${result.data.length} ad accounts`);
+      
+      // Check for sandbox accounts and warn
+      result.data.forEach((account, index) => {
+        // Validate account object
+        if (!account) {
+          console.warn(`⚠️ Null account at index ${index}`);
+          return;
+        }
+        
+        console.log('🔍 Ad Account Details:', {
+          id: account.id,
+          name: account.name,
+          currency: account.currency,
+          timezone: account.timezone,
+          business_name: account.business_name,
+          account_status: account.account_status
+        });
+        
+        // Check if it's a sandbox account (usually has specific naming patterns)
+        // Add null/undefined checks to prevent errors
+        const accountName = account.name || '';
+        const accountId = account.id || '';
+        
+        if (accountName.toLowerCase().includes('sandbox') || 
+            accountId.includes('sandbox') ||
+            accountName.toLowerCase().includes('test')) {
+          console.warn('⚠️ SANDBOX ACCOUNT DETECTED:', accountName);
+          console.warn('⚠️ Sandbox accounts have limitations:');
+          console.warn('   - Cannot create real ads');
+          console.warn('   - Limited API endpoints');
+          console.warn('   - For testing only');
+        }
+      });
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to fetch ad accounts:', error);
+      
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('Network error')) {
+          throw new Error('Unable to connect to Facebook API. Please check your internet connection and try again.');
+        }
+        if (error.message.includes('Access token')) {
+          throw new Error('Authentication failed. Please reconnect your Facebook account.');
+        }
+        if (error.message.includes('CORS')) {
+          throw new Error('Browser security restriction detected. Please ensure you\'re accessing the app from the correct domain.');
+        }
+      }
+      
+      throw error;
+    }
   }
 
   // Get user's pages
