@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import https from 'https';
+import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { logger } from './utils/logger';
@@ -16,6 +17,7 @@ import adRoutes from './routes/ads';
 
 const app = express();
 const PORT = process.env['PORT'] || 3001;
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Security middleware
 app.use(helmet());
@@ -90,19 +92,31 @@ app.use('*', (_req, res) => {
 // Error handling middleware
 app.use(errorHandler);
 
-// HTTPS Configuration for both development and production
-const sslOptions = {
-  key: fs.readFileSync(path.join(__dirname, '..', 'localhost-key.pem')),
-  cert: fs.readFileSync(path.join(__dirname, '..', 'localhost.pem'))
-};
+// Start server based on environment
+if (isDevelopment) {
+  // HTTPS Configuration for development only
+  try {
+    const sslOptions = {
+      key: fs.readFileSync(path.join(__dirname, '..', 'localhost-key.pem')),
+      cert: fs.readFileSync(path.join(__dirname, '..', 'localhost.pem'))
+    };
 
-// Start HTTPS server
-https.createServer(sslOptions, app).listen(PORT, () => {
-  logger.info(`HTTPS Server is running on port ${PORT}`, {
-    port: PORT,
-    protocol: 'https',
-    environment: process.env['NODE_ENV'] || 'development'
+    // Start HTTPS server for development
+    https.createServer(sslOptions, app).listen(PORT, () => {
+      logger.info('HTTPS Server is running on port', PORT);
+    });
+  } catch (error) {
+    logger.warn('SSL certificates not found, falling back to HTTP for development');
+    // Fallback to HTTP for development
+    http.createServer(app).listen(PORT, () => {
+      logger.info('HTTP Server is running on port', PORT);
+    });
+  }
+} else {
+  // HTTP server for production (Render handles HTTPS)
+  http.createServer(app).listen(PORT, () => {
+    logger.info('HTTP Server is running on port', PORT);
   });
-});
+}
 
 export default app; 
