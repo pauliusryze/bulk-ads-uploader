@@ -276,6 +276,12 @@ export class FacebookAdService {
       if (!adItem.budget || adItem.budget <= 0) {
         errors.push(`Ad ${adNumber} (${adItem.filename}): Valid budget is required`);
       }
+      if (!adItem.landingPageUrl?.trim()) {
+        errors.push(`Ad ${adNumber} (${adItem.filename}): Landing page URL is required`);
+      }
+      if (!adItem.landingPageUrl?.startsWith('http')) {
+        errors.push(`Ad ${adNumber} (${adItem.filename}): Landing page URL must be a valid URL starting with http/https`);
+      }
     });
 
     // Validate page ID
@@ -304,16 +310,15 @@ export class FacebookAdService {
           throw new Error(`No video ID found for ${adItem.filename}`);
         }
         
-        // For video creatives, use link_data with video_id (correct Facebook API format)
+        // For video creatives, use video_data (correct Facebook API format)
         const videoCreative = {
           name: `${adItem.adName} Creative`,
           object_story_spec: {
             page_id: pageId,
-            link_data: {
+            video_data: {
               video_id: videoId,
               message: template.adCopy.primaryText || 'Primary Text',
-              link: adItem.landingPageUrl || 'https://your-website.com',
-              name: template.adCopy.headline || 'Ad Headline',
+              title: template.adCopy.headline || 'Ad Headline', // Use title for video creatives
               call_to_action: {
                 type: template.adCopy.callToAction || 'LEARN_MORE',
                 value: {
@@ -324,8 +329,20 @@ export class FacebookAdService {
           },
         };
         
-        // Debug: Log the exact creative data being sent
+        // Enhanced debug logging
         console.log('🔍 Creating video creative with data:', JSON.stringify(videoCreative, null, 2));
+        console.log('🔍 Template data used:', {
+          primaryText: template.adCopy.primaryText,
+          headline: template.adCopy.headline,
+          callToAction: template.adCopy.callToAction,
+          landingPageUrl: adItem.landingPageUrl
+        });
+        console.log('🔍 Ad item data used:', {
+          adName: adItem.adName,
+          mediaType: adItem.mediaType,
+          videoId: videoId,
+          pageId: pageId
+        });
         
         return videoCreative;
       } else {

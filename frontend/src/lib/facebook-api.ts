@@ -175,7 +175,8 @@ class FacebookAPIClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    retryCount = 0
   ): Promise<T> {
     // In development mode, return mock data
     if (this.isDevelopmentMode) {
@@ -189,116 +190,146 @@ class FacebookAPIClient {
 
     // Check if endpoint already has query parameters
     const separator = endpoint.includes('?') ? '&' : '?';
-    const response = await fetch(`${url}${separator}${params}`, {
-      ...options,
+    const fullUrl = `${url}${separator}${params}`;
+    
+    const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
         'User-Agent': 'FacebookAdsUploader/1.0',
         ...options.headers,
       },
-    });
+      ...options,
+    };
 
-    if (!response.ok) {
-      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-      try {
-        const error: FacebookAPIError = await response.json();
-        errorMessage = error.error.message;
+    try {
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(fullUrl, {
+        ...config,
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+
+      // Handle different response types
+      if (response.headers.get('content-type')?.includes('application/json')) {
+        const responseText = await response.text();
+        let data;
         
-        // Enhanced error logging with full response details
-        console.error('❌ Facebook API Error Details:', {
-          code: error.error.code,
-          message: error.error.message,
-          error_subcode: error.error.error_subcode,
-          error_user_title: error.error.error_user_title,
-          error_user_msg: error.error.error_user_msg,
-          endpoint: endpoint,
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('❌ Failed to parse response as JSON:', responseText);
+          throw new Error(`Invalid JSON response: ${responseText}`);
+        }
+
+        if (!response.ok) {
+          console.error('❌ Facebook API Error Response:', {
+            status: response.status,
+            statusText: response.statusText,
+            url: fullUrl,
+            data: data,
+            responseText: responseText
+          });
+
+          // Enhanced error handling for Facebook API
+          if (data.error) {
+            const error = data.error;
+            console.error('❌ Facebook API Error Details:', {
+              code: error.code,
+              message: error.message,
+              error_subcode: error.error_subcode,
+              error_user_title: error.error_user_title,
+              error_user_msg: error.error_user_msg,
+              fbtrace_id: error.fbtrace_id
+            });
+
+            // Provide specific error messages based on error codes
+            if (error.code === 100) {
+              // Invalid parameter errors
+              const errorMsg = error.message.toLowerCase();
+              if (errorMsg.includes('video_id')) {
+                throw new Error(`Invalid video ID: ${error.message}. Please re-upload the video.`);
+              }
+              if (errorMsg.includes('page_id')) {
+                throw new Error(`Invalid page ID: ${error.message}. Please check your Facebook page selection.`);
+              }
+              if (errorMsg.includes('message')) {
+                throw new Error(`Ad message error: ${error.message}. Please check your ad copy.`);
+              }
+              if (errorMsg.includes('title')) {
+                throw new Error(`Ad title error: ${error.message}. Please check your headline.`);
+              }
+              if (errorMsg.includes('link')) {
+                throw new Error(`Landing page URL error: ${error.message}. Please check your URL.`);
+              }
+              if (errorMsg.includes('call_to_action')) {
+                throw new Error(`Call to action error: ${error.message}. Please check your CTA settings.`);
+              }
+              if (errorMsg.includes('object_story_spec')) {
+                throw new Error(`Creative specification error: ${error.message}. Please check your ad creative settings.`);
+              }
+              throw new Error(`Facebook API Parameter Error: ${error.message}`);
+            }
+            
+            if (error.code === 17) {
+              throw new Error('Rate limit exceeded. Please wait before making more requests.');
+            }
+            
+            if (error.code === 200) {
+              throw new Error('Insufficient permissions. Your app may need additional review.');
+            }
+            
+            if (error.code === 1487698) {
+              throw new Error('Ad creative contains prohibited content. Please review Facebook\'s advertising policies.');
+            }
+            
+            if (error.code === 1487699) {
+              throw new Error('Ad targeting is too broad or too narrow. Please adjust your targeting settings.');
+            }
+            
+            if (error.code === 1487700) {
+              throw new Error('Ad creative format is not supported for the selected placement.');
+            }
+
+            throw new Error(`Facebook API Error (${error.code}): ${error.message}`);
+          }
+
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return data;
+      } else {
+        // Handle non-JSON responses
+        const responseText = await response.text();
+        console.error('❌ Non-JSON response:', {
           status: response.status,
-          fullError: error // Log the complete error object
+          statusText: response.statusText,
+          contentType: response.headers.get('content-type'),
+          responseText: responseText
         });
         
-        // Enhanced error handling for common issues
-        if (error.error.code === 190) {
-          throw new Error('Invalid access token. Please reconnect your Facebook account.');
-        }
-        if (error.error.code === 100) {
-          // Provide more specific error details for common ad creation issues
-          const errorMsg = error.error.message;
-          if (errorMsg.includes('Country Code')) {
-            throw new Error('Invalid country code format. Please check geo targeting settings.');
-          }
-          if (errorMsg.includes('video_id')) {
-            throw new Error('Invalid video ID. Please re-upload the video file.');
-          }
-          if (errorMsg.includes('image_hash')) {
-            throw new Error('Invalid image hash. Please re-upload the image file.');
-          }
-          if (errorMsg.includes('message')) {
-            throw new Error('Ad message is required and cannot be empty.');
-          }
-          if (errorMsg.includes('name')) {
-            throw new Error('Ad name is required and cannot be empty.');
-          }
-          if (errorMsg.includes('link')) {
-            throw new Error('Destination link is required and must be a valid URL.');
-          }
-          if (errorMsg.includes('call_to_action')) {
-            throw new Error('Call to action is required and must be a valid type.');
-          }
-          if (errorMsg.includes('daily_budget')) {
-            throw new Error('Daily budget must be at least $1.00 and in cents (e.g., 100 = $1.00).');
-          }
-          if (errorMsg.includes('targeting')) {
-            throw new Error('Targeting configuration is invalid. Please check age, location, and other targeting settings.');
-          }
-          if (errorMsg.includes('optimization_goal')) {
-            throw new Error('Optimization goal is not compatible with the selected objective or targeting.');
-          }
-          if (errorMsg.includes('billing_event')) {
-            throw new Error('Billing event is not compatible with the selected optimization goal.');
-          }
-          if (errorMsg.includes('special_ad_categories')) {
-            throw new Error('Special ad categories are required for certain ad types. Please select appropriate categories.');
-          }
-          if (errorMsg.includes('object_story_spec')) {
-            throw new Error('Ad creative specification is invalid. Please check video/image data and page ID.');
-          }
-          if (errorMsg.includes('page_id')) {
-            throw new Error('Invalid page ID. Please select a valid Facebook page.');
-          }
-          
-          throw new Error(`Invalid parameter: ${errorMsg}. Please check your request data.`);
-        }
-        if (error.error.code === 17) {
-          throw new Error('Rate limit exceeded. Please wait before making more requests.');
-        }
-        if (error.error.code === 200) {
-          throw new Error('Insufficient permissions. Your app may need additional review.');
-        }
-        if (error.error.code === 1487698) {
-          throw new Error('Ad creative contains prohibited content. Please review Facebook\'s advertising policies.');
-        }
-        if (error.error.code === 1487699) {
-          throw new Error('Ad targeting is too broad or too narrow. Please adjust your targeting settings.');
-        }
-        if (error.error.code === 1487700) {
-          throw new Error('Ad creative format is not supported for the selected placement.');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText} - ${responseText}`);
         }
         
-        throw new Error(errorMessage);
-      } catch (parseError) {
-        console.error('❌ Failed to parse Facebook error response:', parseError);
-        console.error('❌ Raw response text:', await response.text());
-        throw new Error(errorMessage);
+        throw new Error(`Unexpected response format: ${responseText}`);
       }
+    } catch (error) {
+      // Handle network errors and timeouts
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Request timeout: The request took too long to complete.');
+        }
+        if (error.message.includes('Failed to fetch')) {
+          throw new Error('Network error: Unable to connect to Facebook API. Please check your internet connection.');
+        }
+        throw error;
+      }
+      throw new Error('Unknown error occurred');
     }
-
-    // Check for API version warnings
-    const versionWarning = response.headers.get('X-Ad-Api-Version-Warning');
-    if (versionWarning) {
-      console.warn('Facebook API Version Warning:', versionWarning);
-    }
-
-    return response.json();
   }
 
   // Mock data for development mode
