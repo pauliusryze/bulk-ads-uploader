@@ -146,6 +146,7 @@ export interface FacebookAdAccount {
   currency: string;
   timezone: string;
   business_name?: string;
+  account_status?: string;
 }
 
 export interface FacebookPage {
@@ -488,25 +489,42 @@ class FacebookAPIClient {
 
   // Get user's ad accounts
   async getAdAccounts(): Promise<{ data: FacebookAdAccount[] }> {
-    const result = await this.request<{ data: FacebookAdAccount[] }>('/me/adaccounts', {
+    const result = await this.request<{ data: FacebookAdAccount[] }>('/me/adaccounts?fields=id,name,currency,timezone,account_status,business', {
       method: 'GET',
     });
     
+    // Validate the response structure
+    if (!result || !result.data || !Array.isArray(result.data)) {
+      console.error('❌ Invalid ad accounts response:', result);
+      throw new Error('Failed to fetch ad accounts - invalid response format');
+    }
+    
     // Check for sandbox accounts and warn
-    result.data.forEach(account => {
+    result.data.forEach((account, index) => {
+      // Validate account object
+      if (!account) {
+        console.warn(`⚠️ Null account at index ${index}`);
+        return;
+      }
+      
       console.log('🔍 Ad Account Details:', {
         id: account.id,
         name: account.name,
         currency: account.currency,
         timezone: account.timezone,
-        business_name: account.business_name
+        business_name: account.business_name,
+        account_status: account.account_status
       });
       
       // Check if it's a sandbox account (usually has specific naming patterns)
-      if (account.name.toLowerCase().includes('sandbox') || 
-          account.id.includes('sandbox') ||
-          account.name.toLowerCase().includes('test')) {
-        console.warn('⚠️ SANDBOX ACCOUNT DETECTED:', account.name);
+      // Add null/undefined checks to prevent errors
+      const accountName = account.name || '';
+      const accountId = account.id || '';
+      
+      if (accountName.toLowerCase().includes('sandbox') || 
+          accountId.includes('sandbox') ||
+          accountName.toLowerCase().includes('test')) {
+        console.warn('⚠️ SANDBOX ACCOUNT DETECTED:', accountName);
         console.warn('⚠️ Sandbox accounts have limitations:');
         console.warn('   - Cannot create real ads');
         console.warn('   - Limited API endpoints');
