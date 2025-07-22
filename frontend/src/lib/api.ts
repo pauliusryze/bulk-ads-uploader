@@ -224,7 +224,8 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    retryCount = 0
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     const config: RequestInit = {
@@ -252,6 +253,18 @@ class ApiClient {
         const data = await response.json();
         
         if (!response.ok) {
+          // Handle rate limiting with retry logic
+          if (response.status === 429 && retryCount < 3) {
+            const retryAfter = data.retryAfter || 15; // Default to 15 seconds
+            console.warn(`Rate limited. Retrying in ${retryAfter} seconds... (attempt ${retryCount + 1}/3)`);
+            
+            // Wait for the specified retry time
+            await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+            
+            // Retry with exponential backoff
+            return this.request<T>(endpoint, options, retryCount + 1);
+          }
+          
           console.error('Backend error response:', JSON.stringify(data, null, 2));
           throw new Error(data.message || data.error || `HTTP ${response.status}: ${response.statusText}`);
         }
@@ -266,10 +279,15 @@ class ApiClient {
         throw new Error('Expected JSON response but received non-JSON data');
       }
     } catch (error) {
-      // Enhanced error handling
-      if (error instanceof TypeError && (error as Error).message.includes('fetch')) {
-        console.error('Network error - server may be down:', error);
-        throw new Error('Unable to connect to server. Please check if the backend is running.');
+      // Enhanced error handling with retry for network errors
+      if (error instanceof TypeError && (error as Error).message.includes('fetch') && retryCount < 3) {
+        console.warn(`Network error. Retrying... (attempt ${retryCount + 1}/3)`);
+        
+        // Exponential backoff: 1s, 2s, 4s
+        const delay = Math.pow(2, retryCount) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        
+        return this.request<T>(endpoint, options, retryCount + 1);
       }
       
       if (error instanceof Error && error.name === 'AbortError') {

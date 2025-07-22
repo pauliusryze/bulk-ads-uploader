@@ -32,10 +32,10 @@ app.use(cors({
   credentials: true
 }));
 
-// Rate limiting - More generous for development
+// Rate limiting - More generous for development and production
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 100 : 1000, // 1000 requests in dev, 100 in prod
+  max: process.env.NODE_ENV === 'production' ? 2000 : 5000, // 2000 requests in prod, 5000 in dev
   message: {
     error: 'RATE_LIMIT_EXCEEDED',
     message: 'Too many requests from this IP, please try again later.',
@@ -48,7 +48,8 @@ const limiter = rateLimit({
     logger.warn('Rate limit exceeded', {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      path: req.path
+      path: req.path,
+      environment: process.env.NODE_ENV
     });
     res.status(429).json({
       success: false,
