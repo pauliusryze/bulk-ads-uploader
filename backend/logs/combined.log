@@ -6926,3 +6926,14 @@
 2025-07-22 09:16:42:1642 [32minfo[39m: [32mAll jobs retrieved[39m
 2025-07-22 09:21:02:212 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
 2025-07-22 09:21:02:212 [32minfo[39m: [32mHTTPS Server is running on port[39m
+2025-07-22 09:29:07:297 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-22 09:29:07:297 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-22 09:29:07:297 [32minfo[39m: [32mGetting templates[39m
+2025-07-22 09:29:07:297 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-22 09:30:05:305 [32minfo[39m: [32mGetting all jobs[39m
+2025-07-22 09:30:05:305 [32minfo[39m: [32mAll jobs retrieved[39m
+2025-07-22 09:30:05:305 [32minfo[39m: [32mGetting templates[39m
+2025-07-22 09:30:05:305 [32minfo[39m: [32mTemplates retrieved successfully[39m
+2025-07-22 10:17:13:1713 [32minfo[39m: [32mStarting server with configuration:[39m
+2025-07-22 10:17:14:1714 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-22 10:17:14:1714 [32minfo[39m: [32mHTTPS Server is running on port[39m

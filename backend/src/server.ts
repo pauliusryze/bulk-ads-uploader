@@ -16,8 +16,14 @@ import templateRoutes from './routes/templates';
 import adRoutes from './routes/ads';
 
 const app = express();
-const PORT = process.env['PORT'] || 3001;
+const PORT = parseInt(process.env.PORT || '3001', 10);
 const isDevelopment = process.env.NODE_ENV === 'development';
+
+logger.info('Starting server with configuration:', {
+  PORT,
+  NODE_ENV: process.env.NODE_ENV,
+  isDevelopment
+});
 
 // Security middleware
 app.use(helmet());
@@ -69,7 +75,9 @@ app.get('/health', (_req, res) => {
   res.status(200).json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    port: PORT,
+    environment: process.env.NODE_ENV
   });
 });
 
@@ -102,20 +110,27 @@ if (isDevelopment) {
     };
 
     // Start HTTPS server for development
-    https.createServer(sslOptions, app).listen(PORT, () => {
+    https.createServer(sslOptions, app).listen(PORT, '0.0.0.0', () => {
       logger.info('HTTPS Server is running on port', PORT);
     });
   } catch (error) {
     logger.warn('SSL certificates not found, falling back to HTTP for development');
     // Fallback to HTTP for development
-    http.createServer(app).listen(PORT, () => {
+    http.createServer(app).listen(PORT, '0.0.0.0', () => {
       logger.info('HTTP Server is running on port', PORT);
     });
   }
 } else {
   // HTTP server for production (Render handles HTTPS)
-  http.createServer(app).listen(PORT, () => {
-    logger.info('HTTP Server is running on port', PORT);
+  const server = http.createServer(app);
+  
+  server.listen(PORT, '0.0.0.0', () => {
+    logger.info('HTTP Server is running on port', PORT, 'in production mode');
+  });
+  
+  server.on('error', (error) => {
+    logger.error('Server error:', error);
+    process.exit(1);
   });
 }
 
