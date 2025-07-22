@@ -233,6 +233,98 @@ function DashboardContent() {
     }
   });
 
+  // Extract video thumbnail from video file
+  const extractVideoThumbnail = async (videoFile: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      console.log('🎬 Creating video element for thumbnail extraction');
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        console.error('❌ Cannot get canvas context');
+        reject(new Error('Could not get canvas context'));
+        return;
+      }
+      
+      // Set a timeout to prevent hanging
+      const timeout = setTimeout(() => {
+        console.error('❌ Video thumbnail extraction timeout');
+        video.remove();
+        canvas.remove();
+        reject(new Error('Video thumbnail extraction timeout'));
+      }, 10000); // 10 second timeout
+      
+      video.onloadedmetadata = () => {
+        console.log('🎬 Video metadata loaded:', {
+          duration: video.duration,
+          videoWidth: video.videoWidth,
+          videoHeight: video.videoHeight
+        });
+        
+        // Set canvas dimensions to video dimensions (or max 1200x630 for Facebook)
+        const maxWidth = 1200;
+        const maxHeight = 630;
+        let { videoWidth, videoHeight } = video;
+        
+        // Calculate aspect ratio and resize if needed
+        const aspectRatio = videoWidth / videoHeight;
+        if (videoWidth > maxWidth) {
+          videoWidth = maxWidth;
+          videoHeight = maxWidth / aspectRatio;
+        }
+        if (videoHeight > maxHeight) {
+          videoHeight = maxHeight;
+          videoWidth = maxHeight * aspectRatio;
+        }
+        
+        canvas.width = videoWidth;
+        canvas.height = videoHeight;
+        
+        console.log('🎬 Canvas dimensions set:', { width: videoWidth, height: videoHeight });
+        
+        // Seek to a random frame (between 10% and 90% of video duration)
+        const randomTime = video.duration * (0.1 + Math.random() * 0.8);
+        console.log('🎬 Seeking to time:', randomTime, 'of', video.duration);
+        video.currentTime = randomTime;
+      };
+      
+      video.onseeked = () => {
+        console.log('🎬 Video seeked, drawing to canvas');
+        try {
+          // Draw the video frame to canvas
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          // Convert canvas to data URL
+          const thumbnailDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          console.log('✅ Canvas converted to data URL, length:', thumbnailDataUrl.length);
+          
+          clearTimeout(timeout);
+          resolve(thumbnailDataUrl);
+          
+          // Clean up
+          video.remove();
+          canvas.remove();
+        } catch (error) {
+          console.error('❌ Error drawing video frame:', error);
+          clearTimeout(timeout);
+          reject(error);
+        }
+      };
+      
+      video.onerror = (error) => {
+        console.error('❌ Video loading error:', error);
+        clearTimeout(timeout);
+        reject(new Error('Failed to load video for thumbnail extraction'));
+      };
+      
+      // Set video source and load
+      console.log('🎬 Setting video source and loading');
+      video.src = URL.createObjectURL(videoFile);
+      video.load();
+    });
+  };
+
   // Media upload handling for bulk ads session - Direct to Facebook
   const handleMediaUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -269,6 +361,21 @@ function DashboardContent() {
           // Upload to Facebook directly using the API client
           const result = await apiClient.uploadMedia(selectedAdAccount.id, file);
           
+          // Extract thumbnail for videos
+          let thumbnailUrl = URL.createObjectURL(file); // Default to file URL
+          if (file.type.startsWith('video/')) {
+            try {
+              // Extract a random frame from the video as thumbnail
+              console.log('🎬 Starting video thumbnail extraction for:', file.name);
+              thumbnailUrl = await extractVideoThumbnail(file);
+              console.log('✅ Extracted video thumbnail successfully');
+              console.log('🖼️ Thumbnail URL preview:', thumbnailUrl.substring(0, 100) + '...');
+            } catch (error) {
+              console.warn('⚠️ Failed to extract video thumbnail, using default:', error);
+              // Keep the default file URL
+            }
+          }
+          
           // Create media object for our session
           const mediaObj = {
             id: `fb-${Date.now()}-${Math.random()}`,
@@ -289,7 +396,7 @@ function DashboardContent() {
             mediaId: mediaObj.id,
             mediaType: mediaObj.mediaType,
             filename: mediaObj.filename,
-            thumbnailUrl: mediaObj.url,
+            thumbnailUrl: thumbnailUrl, // Use extracted thumbnail for videos
             facebookMediaHash: result.hash, // Store Facebook media hash
             facebookMediaId: result.id, // Store Facebook media ID
             campaignId: '',
@@ -655,6 +762,12 @@ function DashboardContent() {
         });
         return;
       }
+
+      console.log('🎯 DASHBOARD DEBUG - About to create bulk ads:');
+      console.log('🎯 Selected campaign ID:', bulkAdsForm.massApplyOptions.campaignId);
+      console.log('🎯 Default page ID:', defaultPageId);
+      console.log('🎯 Ad account ID:', selectedAdAccount.id);
+      console.log('🎯 Number of ad items:', bulkAdsForm.adItems.length);
 
       const result = await facebookService.createBulkAdsWithPreview(
         enhancedTemplate,

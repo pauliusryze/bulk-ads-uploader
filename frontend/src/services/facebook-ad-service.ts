@@ -310,6 +310,37 @@ export class FacebookAdService {
           throw new Error(`No video ID found for ${adItem.filename}`);
         }
         
+        console.log('🔍 Video creative creation details:', {
+          filename: adItem.filename,
+          videoId: videoId,
+          pageId: pageId,
+          primaryText: template.adCopy.primaryText,
+          headline: template.adCopy.headline,
+          callToAction: template.adCopy.callToAction,
+          landingPageUrl: adItem.landingPageUrl
+        });
+        
+        // VALIDATE VIDEO PARAMETERS BEFORE CREATING CREATIVE
+        console.log('🔍 VALIDATING VIDEO PARAMETERS:');
+        console.log('🔍 Video ID type:', typeof videoId, 'Value:', videoId);
+        console.log('🔍 Page ID type:', typeof pageId, 'Value:', pageId);
+        console.log('🔍 Primary text type:', typeof template.adCopy.primaryText, 'Value:', template.adCopy.primaryText);
+        console.log('🔍 Landing page URL type:', typeof adItem.landingPageUrl, 'Value:', adItem.landingPageUrl);
+        
+        // Check for empty or invalid values
+        if (!videoId || videoId.trim() === '') {
+          throw new Error(`Invalid video ID: "${videoId}" for ${adItem.filename}`);
+        }
+        if (!pageId || pageId.trim() === '') {
+          throw new Error(`Invalid page ID: "${pageId}"`);
+        }
+        if (!template.adCopy.primaryText || template.adCopy.primaryText.trim() === '') {
+          throw new Error(`Invalid primary text: "${template.adCopy.primaryText}"`);
+        }
+        if (!adItem.landingPageUrl || adItem.landingPageUrl.trim() === '') {
+          throw new Error(`Invalid landing page URL: "${adItem.landingPageUrl}"`);
+        }
+        
         // For video creatives, use video_data (correct Facebook API format)
         const videoCreative = {
           name: `${adItem.adName} Creative`,
@@ -318,7 +349,8 @@ export class FacebookAdService {
             video_data: {
               video_id: videoId,
               message: template.adCopy.primaryText || 'Primary Text',
-              title: template.adCopy.headline || 'Ad Headline', // Use title for video creatives
+              // Facebook requires either image_hash or image_url for video thumbnail
+              image_url: adItem.thumbnailUrl || 'https://via.placeholder.com/1200x630/1877f2/ffffff?text=Video+Thumbnail',
               call_to_action: {
                 type: template.adCopy.callToAction || 'LEARN_MORE',
                 value: {
@@ -329,20 +361,7 @@ export class FacebookAdService {
           },
         };
         
-        // Enhanced debug logging
         console.log('🔍 Creating video creative with data:', JSON.stringify(videoCreative, null, 2));
-        console.log('🔍 Template data used:', {
-          primaryText: template.adCopy.primaryText,
-          headline: template.adCopy.headline,
-          callToAction: template.adCopy.callToAction,
-          landingPageUrl: adItem.landingPageUrl
-        });
-        console.log('🔍 Ad item data used:', {
-          adName: adItem.adName,
-          mediaType: adItem.mediaType,
-          videoId: videoId,
-          pageId: pageId
-        });
         
         return videoCreative;
       } else {
@@ -511,12 +530,18 @@ export class FacebookAdService {
 
     try {
       // 1. Use existing campaign or create new one
+      console.log('🏭 CAMPAIGN HANDLING DEBUG:');
+      console.log('🏭 existingCampaignId:', existingCampaignId);
+      console.log('🏭 Should use existing campaign:', !!existingCampaignId);
+      
       if (existingCampaignId) {
         onProgress?.(10, 'Using existing campaign...');
         result.campaignId = existingCampaignId;
+        console.log('✅ Using existing campaign ID:', existingCampaignId);
         onProgress?.(20, 'Using existing campaign');
       } else {
         onProgress?.(10, 'Creating campaign...');
+        console.log('🆕 Creating new campaign because existingCampaignId is not provided');
         const campaignData = this.mapTemplateToCampaign(template);
         const campaignResult = await this.apiClient.createCampaign(adAccountId, campaignData);
         result.campaignId = campaignResult.id;
@@ -534,41 +559,78 @@ export class FacebookAdService {
           onProgress?.(20 + (completedSteps / totalSteps) * 60, `Creating ad ${i + 1}/${adItems.length}...`);
           
           // Create ad set
-          const adSetData = this.mapTemplateToAdSet(
-            template,
-            result.campaignId,
-            adItem.adSetName,
-            budget,
-            adItem.bidStrategy,
-            adItem.bidAmount
-          );
-          
-          // Debug: Log the ad set data being sent to Facebook
-          console.log('🔍 Creating ad set with data:', JSON.stringify(adSetData, null, 2));
-          
-          const adSetResult = await this.apiClient.createAdSet(adAccountId, adSetData);
-          result.adSetIds.push(adSetResult.id);
-          completedSteps++;
+          let adSetResult: { id: string };
+          try {
+            const adSetData = this.mapTemplateToAdSet(
+              template,
+              result.campaignId,
+              adItem.adSetName,
+              budget,
+              adItem.bidStrategy,
+              adItem.bidAmount
+            );
+            
+            // Debug: Log the ad set data being sent to Facebook
+            console.log('🔍 Creating ad set with data:', JSON.stringify(adSetData, null, 2));
+            
+            adSetResult = await this.apiClient.createAdSet(adAccountId, adSetData);
+            result.adSetIds.push(adSetResult.id);
+            completedSteps++;
+          } catch (error) {
+            throw new Error(`Failed to create ad set for ${adItem.adName}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
 
           onProgress?.(20 + (completedSteps / totalSteps) * 60, `Creating creative for ad ${i + 1}...`);
           
+          // For videos, wait for processing to complete before creating creative
+          if (adItem.mediaType === 'video' && adItem.facebookMediaId) {
+            onProgress?.(20 + (completedSteps / totalSteps) * 60, `Waiting for video processing for ad ${i + 1}...`);
+            console.log('🔍 Waiting for video to be ready:', adItem.facebookMediaId);
+            
+            // TEMPORARILY SKIP VIDEO PROCESSING WAIT FOR TESTING
+            console.log('🧪 SKIPPING video processing wait for testing...');
+            /*
+            const isVideoReady = await this.apiClient.waitForVideoReady(adItem.facebookMediaId, 60000); // 1 minute timeout
+            if (!isVideoReady) {
+              throw new Error(`Video processing failed or timed out for ${adItem.filename}`);
+            }
+            */
+          }
+          
           // Create creative
-          const creativeData = this.mapTemplateToCreative(template, adItem, pageId);
-          
-          // Debug: Log the creative data being sent to Facebook
-          console.log('🔍 Creating creative with data:', JSON.stringify(creativeData, null, 2));
-          
-          const creativeResult = await this.apiClient.createAdCreative(adAccountId, creativeData);
-          result.creativeIds.push(creativeResult.id);
-          completedSteps++;
+          let creativeResult: { id: string };
+          let creativeData: FacebookCreativeData;
+          try {
+            creativeData = this.mapTemplateToCreative(template, adItem, pageId);
+            
+            // Check if we're using a sandbox account
+            if (adAccountId.includes('sandbox') || adAccountId.includes('test')) {
+              console.warn('⚠️ ATTEMPTING TO CREATE CREATIVE IN SANDBOX ACCOUNT');
+              console.warn('⚠️ This will likely fail due to sandbox limitations');
+              console.warn('⚠️ Sandbox accounts cannot create real ad creatives');
+            }
+            
+            // Debug: Log the creative data being sent to Facebook
+            console.log('🔍 Creating creative with data:', JSON.stringify(creativeData, null, 2));
+            
+            creativeResult = await this.apiClient.createAdCreative(adAccountId, creativeData);
+            result.creativeIds.push(creativeResult.id);
+            completedSteps++;
+          } catch (error) {
+            throw new Error(`Failed to create creative for ${adItem.adName}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
 
           onProgress?.(20 + (completedSteps / totalSteps) * 60, `Creating ad ${i + 1}...`);
           
           // Create ad
-          const adData = this.mapAdItemToAd(adItem, adSetResult.id, creativeResult.id);
-          const adResult = await this.apiClient.createAd(adAccountId, adData);
-          result.adIds.push(adResult.id);
-          completedSteps++;
+          try {
+            const adData = this.mapAdItemToAd(adItem, adSetResult.id, creativeResult.id);
+            const adResult = await this.apiClient.createAd(adAccountId, adData);
+            result.adIds.push(adResult.id);
+            completedSteps++;
+          } catch (error) {
+            throw new Error(`Failed to create ad for ${adItem.adName}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
 
           onProgress?.(20 + (completedSteps / totalSteps) * 60, `Generating preview for ad ${i + 1}...`);
           
@@ -580,6 +642,15 @@ export class FacebookAdService {
           const errorMessage = `Failed to create ad ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`;
           result.errors.push(errorMessage);
           console.error(errorMessage, error);
+          
+          // Add more specific error context
+          console.error('🔍 Failed ad item details:', {
+            adName: adItem.adName,
+            mediaType: adItem.mediaType,
+            videoId: adItem.facebookMediaId,
+            pageId: pageId,
+            campaignId: result.campaignId
+          });
         }
       }
 
@@ -593,7 +664,7 @@ export class FacebookAdService {
       onProgress?.(100, 'Bulk ad creation completed!');
 
     } catch (error) {
-      const errorMessage = `Failed to create campaign: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      const errorMessage = `Failed to create bulk ads: ${error instanceof Error ? error.message : 'Unknown error'}`;
       result.errors.push(errorMessage);
       console.error(errorMessage, error);
     }
@@ -643,5 +714,65 @@ export class FacebookAdService {
         console.error(`Failed to delete ad ${adId}:`, error);
       }
     }
+  }
+
+  // Extract video thumbnail from video file
+  private async extractVideoThumbnail(videoFile: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        reject(new Error('Could not get canvas context'));
+        return;
+      }
+      
+      video.onloadedmetadata = () => {
+        // Set canvas dimensions to video dimensions (or max 1200x630 for Facebook)
+        const maxWidth = 1200;
+        const maxHeight = 630;
+        let { videoWidth, videoHeight } = video;
+        
+        // Calculate aspect ratio and resize if needed
+        const aspectRatio = videoWidth / videoHeight;
+        if (videoWidth > maxWidth) {
+          videoWidth = maxWidth;
+          videoHeight = maxWidth / aspectRatio;
+        }
+        if (videoHeight > maxHeight) {
+          videoHeight = maxHeight;
+          videoWidth = maxHeight * aspectRatio;
+        }
+        
+        canvas.width = videoWidth;
+        canvas.height = videoHeight;
+        
+        // Seek to a random frame (between 10% and 90% of video duration)
+        const randomTime = video.duration * (0.1 + Math.random() * 0.8);
+        video.currentTime = randomTime;
+      };
+      
+      video.onseeked = () => {
+        // Draw the video frame to canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Convert canvas to data URL
+        const thumbnailDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        resolve(thumbnailDataUrl);
+        
+        // Clean up
+        video.remove();
+        canvas.remove();
+      };
+      
+      video.onerror = () => {
+        reject(new Error('Failed to load video for thumbnail extraction'));
+      };
+      
+      // Set video source and load
+      video.src = URL.createObjectURL(videoFile);
+      video.load();
+    });
   }
 } 

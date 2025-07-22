@@ -164,8 +164,12 @@ export interface FacebookCustomAudience {
 
 class FacebookAPIClient {
   private config: FacebookAPIConfig;
-  private baseUrl = 'https://graph.facebook.com/v22.0';
+  private baseUrl = 'https://graph.facebook.com/v23.0';
   private isDevelopmentMode: boolean;
+  private requestQueue: Array<() => Promise<any>> = [];
+  private isProcessingQueue = false;
+  private lastRequestTime = 0;
+  private minRequestInterval = 100; // Minimum 100ms between requests
 
   constructor(config: FacebookAPIConfig) {
     this.config = config;
@@ -191,6 +195,33 @@ class FacebookAPIClient {
     // Check if endpoint already has query parameters
     const separator = endpoint.includes('?') ? '&' : '?';
     const fullUrl = `${url}${separator}${params}`;
+    
+    // IMMEDIATE DEBUGGING - Log what we're about to send
+    console.log('🚀 Facebook API Request:', {
+      endpoint: endpoint,
+      method: options.method || 'GET',
+      url: fullUrl,
+      body: options.body ? JSON.parse(options.body as string) : undefined,
+      headers: options.headers
+    });
+    
+    // Additional debugging for creative creation
+    if (endpoint.includes('adcreatives')) {
+      console.log('🎨 CREATIVE CREATION DEBUG:');
+      console.log('🎨 Endpoint:', endpoint);
+      console.log('🎨 Body:', options.body);
+      if (options.body) {
+        const parsedBody = JSON.parse(options.body as string);
+        console.log('🎨 Parsed Body:', JSON.stringify(parsedBody, null, 2));
+        
+        // Check specific video parameters
+        if (parsedBody.object_story_spec?.video_data) {
+          console.log('🎥 Video Data:', parsedBody.object_story_spec.video_data);
+          console.log('🎥 Video ID:', parsedBody.object_story_spec.video_data.video_id);
+          console.log('🎥 Page ID:', parsedBody.object_story_spec.page_id);
+        }
+      }
+    }
     
     const config: RequestInit = {
       headers: {
@@ -245,6 +276,14 @@ class FacebookAPIClient {
               error_user_msg: error.error_user_msg,
               fbtrace_id: error.fbtrace_id
             });
+            
+            // Log the full error response for debugging
+            console.error('❌ Full Facebook Error Response:', JSON.stringify(data, null, 2));
+            console.error('❌ Request that failed:', {
+              url: fullUrl,
+              method: config.method,
+              body: options.body ? JSON.parse(options.body as string) : undefined
+            });
 
             // Provide specific error messages based on error codes
             if (error.code === 100) {
@@ -276,6 +315,14 @@ class FacebookAPIClient {
             
             if (error.code === 17) {
               throw new Error('Rate limit exceeded. Please wait before making more requests.');
+            }
+            
+            if (error.code === 4) {
+              throw new Error('Application request limit reached. Please reduce the frequency of requests.');
+            }
+            
+            if (error.code === 190) {
+              throw new Error('Access token expired or invalid. Please re-authenticate with Facebook.');
             }
             
             if (error.code === 200) {
@@ -332,7 +379,47 @@ class FacebookAPIClient {
     }
   }
 
-  // Mock data for development mode
+  // Rate limiting mechanism based on Facebook's recommendations
+  private async queueRequest<T>(requestFn: () => Promise<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.requestQueue.push(async () => {
+        try {
+          const result = await requestFn();
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      });
+      this.processQueue();
+    });
+  }
+
+  private async processQueue(): Promise<void> {
+    if (this.isProcessingQueue || this.requestQueue.length === 0) {
+      return;
+    }
+
+    this.isProcessingQueue = true;
+
+    while (this.requestQueue.length > 0) {
+      const now = Date.now();
+      const timeSinceLastRequest = now - this.lastRequestTime;
+      
+      if (timeSinceLastRequest < this.minRequestInterval) {
+        await new Promise(resolve => setTimeout(resolve, this.minRequestInterval - timeSinceLastRequest));
+      }
+
+      const requestFn = this.requestQueue.shift();
+      if (requestFn) {
+        this.lastRequestTime = Date.now();
+        await requestFn();
+      }
+    }
+
+    this.isProcessingQueue = false;
+  }
+
+  // Mock data for development
   private getMockData<T>(endpoint: string): T {
     console.log('Development mode: Using mock data for', endpoint);
     
@@ -401,7 +488,33 @@ class FacebookAPIClient {
 
   // Get user's ad accounts
   async getAdAccounts(): Promise<{ data: FacebookAdAccount[] }> {
-    return this.request(`/me/adaccounts?fields=id,name,currency,timezone,account_status,business`);
+    const result = await this.request<{ data: FacebookAdAccount[] }>('/me/adaccounts', {
+      method: 'GET',
+    });
+    
+    // Check for sandbox accounts and warn
+    result.data.forEach(account => {
+      console.log('🔍 Ad Account Details:', {
+        id: account.id,
+        name: account.name,
+        currency: account.currency,
+        timezone: account.timezone,
+        business_name: account.business_name
+      });
+      
+      // Check if it's a sandbox account (usually has specific naming patterns)
+      if (account.name.toLowerCase().includes('sandbox') || 
+          account.id.includes('sandbox') ||
+          account.name.toLowerCase().includes('test')) {
+        console.warn('⚠️ SANDBOX ACCOUNT DETECTED:', account.name);
+        console.warn('⚠️ Sandbox accounts have limitations:');
+        console.warn('   - Cannot create real ads');
+        console.warn('   - Limited API endpoints');
+        console.warn('   - For testing only');
+      }
+    });
+    
+    return result;
   }
 
   // Get user's pages
@@ -755,10 +868,20 @@ class FacebookAPIClient {
     }
 
     const result = await response.json();
-    console.log("✅ Facebook media upload success:", result);
+    console.log("✅ Facebook media upload success - Full response:", result);
+    console.log("✅ Facebook media upload success - Response keys:", Object.keys(result));
     
     // Facebook returns different response formats for images vs videos
     if (file.type.startsWith("video/")) {
+      console.log("🔍 Processing video response - Video ID:", result.id);
+      console.log("🔍 Processing video response - Video status:", result.status);
+      console.log("🔍 Processing video response - Video processing status:", result.processing_status);
+      
+      // Check if video is still processing
+      if (result.status && result.status.video_status === 'PROCESSING') {
+        console.warn("⚠️ Video is still processing. This might cause issues with ad creation.");
+      }
+      
       return {
         id: result.id,
         hash: result.id // For videos, use ID as hash
@@ -766,6 +889,8 @@ class FacebookAPIClient {
     } else {
       // For images, Facebook returns { images: { filename: { hash: "..." } } }
       const imageData = result.images && result.images[Object.keys(result.images)[0]];
+      console.log("🔍 Processing image response - Image hash:", imageData?.hash);
+      
       return {
         id: imageData?.hash || result.id,
         hash: imageData?.hash || result.id
@@ -803,6 +928,9 @@ class FacebookAPIClient {
 
   // Create ad creative
   async createAdCreative(adAccountId: string, data: FacebookCreativeData): Promise<{ id: string }> {
+    console.log('🔍 Creating ad creative with data:', JSON.stringify(data, null, 2));
+    console.log('🔍 Ad account ID:', adAccountId);
+    
     return this.request(`/${adAccountId}/adcreatives`, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -846,6 +974,82 @@ class FacebookAPIClient {
     await this.request(`/${adId}`, {
       method: 'DELETE',
     });
+  }
+
+  // Check video processing status
+  async checkVideoStatus(videoId: string): Promise<{ status: string; processing_status?: string }> {
+    if (this.isDevelopmentMode) {
+      console.log("Development mode: Mock video status check for", videoId);
+      return { status: 'READY' };
+    }
+
+    console.log("🔍 Checking video status for:", videoId);
+    
+    const result = await this.request<{ status: string; processing_status?: string }>(`/${videoId}`, {
+      method: 'GET',
+    });
+    
+    console.log("🔍 Video status result:", result);
+    return result;
+  }
+
+  // Batch requests as recommended by Facebook's Graph API documentation
+  async batchRequest(requests: Array<{ method: string; relative_url: string; body?: string }>): Promise<any[]> {
+    if (this.isDevelopmentMode) {
+      console.log("Development mode: Mock batch request for", requests.length, "requests");
+      return requests.map((_, index) => ({ id: `mock_result_${index}` }));
+    }
+
+    console.log("🔗 Executing batch request with", requests.length, "requests");
+    
+    const batchData = {
+      batch: JSON.stringify(requests),
+      include_headers: 'false'
+    };
+
+    const result = await this.request<any[]>('/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams(batchData).toString(),
+    });
+
+    console.log("✅ Batch request completed");
+    return result;
+  }
+
+  // Wait for video to be ready (with timeout)
+  async waitForVideoReady(videoId: string, maxWaitTime: number = 300000): Promise<boolean> {
+    const startTime = Date.now();
+    const checkInterval = 5000; // Check every 5 seconds
+    
+    while (Date.now() - startTime < maxWaitTime) {
+      try {
+        const status = await this.checkVideoStatus(videoId);
+        console.log("🔍 Video status check:", status);
+        
+        if (status.status === 'READY' || status.processing_status === 'FINISHED') {
+          console.log("✅ Video is ready for use");
+          return true;
+        }
+        
+        if (status.status === 'ERROR' || status.processing_status === 'ERROR') {
+          console.error("❌ Video processing failed:", status);
+          return false;
+        }
+        
+        console.log("⏳ Video still processing, waiting...");
+        await new Promise(resolve => setTimeout(resolve, checkInterval));
+        
+      } catch (error) {
+        console.error("❌ Error checking video status:", error);
+        return false;
+      }
+    }
+    
+    console.warn("⚠️ Video processing timeout");
+    return false;
   }
 }
 

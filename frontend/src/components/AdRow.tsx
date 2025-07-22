@@ -40,24 +40,65 @@ export function AdRow({ ad, campaigns, facebookPages, instagramPages, pixels, te
     });
   };
 
+  // Debug thumbnail URL
+  console.log('🔍 AdRow thumbnail debug for', ad.filename, ':', {
+    mediaType: ad.mediaType,
+    thumbnailUrl: ad.thumbnailUrl,
+    isDataUrl: ad.thumbnailUrl?.startsWith('data:'),
+    urlLength: ad.thumbnailUrl?.length
+  });
+
   return (
     <Card className="mb-4">
       <CardContent className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Media Thumbnail */}
           <div className="flex items-center space-x-3">
-            <div className="relative w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+            <div className="relative w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
               {ad.mediaType === 'video' ? (
-                <Play className="w-6 h-6 text-gray-500" />
+                <>
+                  {/* Show extracted video thumbnail if available */}
+                  {ad.thumbnailUrl ? (
+                    <img 
+                      src={ad.thumbnailUrl} 
+                      alt="Video thumbnail"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <Play className="w-6 h-6 text-gray-500" />
+                  )}
+                  {/* Video indicator overlay */}
+                  <div className="absolute bottom-0 right-0 bg-black bg-opacity-70 text-white text-xs px-1 rounded-tl">
+                    <Play className="w-3 h-3" />
+                  </div>
+                </>
               ) : (
-                <div className="w-full h-full bg-gray-200 rounded-lg" />
+                <>
+                  {/* Show image thumbnail */}
+                  {ad.thumbnailUrl ? (
+                    <img 
+                      src={ad.thumbnailUrl} 
+                      alt="Image thumbnail"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 rounded-lg" />
+                  )}
+                </>
               )}
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium truncate">{ad.filename}</p>
-              <Badge variant="secondary" className="text-xs">
-                {ad.mediaType.toUpperCase()}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  {ad.mediaType.toUpperCase()}
+                </Badge>
+                {ad.mediaType === 'video' && ad.thumbnailUrl?.startsWith('data:') && (
+                  <Badge variant="outline" className="text-xs text-green-600">
+                    THUMB
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
 
