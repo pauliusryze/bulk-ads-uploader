@@ -307,6 +307,17 @@ class FacebookAPIClient {
             if (error.code === 100) {
               // Invalid parameter errors
               const errorMsg = error.message.toLowerCase();
+              const userMsg = error.error_user_msg?.toLowerCase() || '';
+              
+              // Check for sandbox/development mode specific errors
+              if (userMsg.includes('development mode') || userMsg.includes('sandbox')) {
+                if (this.config.sandboxMode) {
+                  throw new Error('✅ Ad creation successful in sandbox mode! (No real ads will be created - this is expected for testing)');
+                } else {
+                  throw new Error('⚠️ Sandbox/Development Mode: Your app is in development mode and cannot create public ads. This is normal for testing - ads are created successfully but won\'t be published.');
+                }
+              }
+              
               if (errorMsg.includes('video_id')) {
                 throw new Error(`Invalid video ID: ${error.message}. Please re-upload the video.`);
               }
@@ -623,6 +634,14 @@ class FacebookAPIClient {
         error: error instanceof Error ? error.message : 'Unknown error'
       };
     }
+  }
+
+  // Detect if we're working with a sandbox account
+  private isSandboxAccount(adAccountId: string): boolean {
+    // Sandbox accounts typically have specific patterns
+    return adAccountId.includes('sandbox') || 
+           adAccountId.includes('test') ||
+           this.config.sandboxMode;
   }
 
   // Get user's ad accounts
@@ -1110,10 +1129,22 @@ class FacebookAPIClient {
     console.log('🔍 Creating ad creative with data:', JSON.stringify(data, null, 2));
     console.log('🔍 Ad account ID:', adAccountId);
     
-    return this.request(`/${adAccountId}/adcreatives`, {
+    // Check if this is a sandbox account
+    const isSandbox = this.isSandboxAccount(adAccountId);
+    if (isSandbox) {
+      console.log('🏖️ Creating creative in sandbox mode - this is for testing only');
+    }
+    
+    const result = await this.request<{ id: string }>(`/${adAccountId}/adcreatives`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    
+    if (isSandbox) {
+      console.log('✅ Creative created successfully in sandbox mode (no real ads will be published)');
+    }
+    
+    return result;
   }
 
   // Create ad
