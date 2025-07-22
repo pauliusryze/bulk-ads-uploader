@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import { logger } from './utils/logger';
 import path from 'path';
 
 // Load environment variables
@@ -7,7 +6,21 @@ import path from 'path';
 dotenv.config({ path: path.resolve(process.cwd(), 'env.local') });
 dotenv.config(); // Fallback to .env
 
-// Import and start the server
-import './server';
+console.log('Starting Facebook Ads Bulk Uploader Backend...');
+console.log('Environment:', process.env.NODE_ENV);
+console.log('Port:', process.env.PORT);
 
-logger.info('Starting Facebook Ads Bulk Uploader Backend...'); 
+// Import logger first
+import { logger } from './utils/logger';
+
+logger.info('Starting Facebook Ads Bulk Uploader Backend...');
+
+// Import and start the server with error handling
+try {
+  import('./server');
+  logger.info('Server module imported successfully');
+} catch (error) {
+  logger.error('Failed to import server module:', error);
+  console.error('Failed to import server module:', error);
+  process.exit(1);
+} 

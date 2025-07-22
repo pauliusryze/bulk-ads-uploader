@@ -6946,3 +6946,7 @@
 2025-07-22 10:21:22:2122 [32minfo[39m: [32mStarting server with configuration:[39m
 2025-07-22 10:21:22:2122 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
 2025-07-22 10:21:22:2122 [32minfo[39m: [32mHTTPS Server is running on port[39m
+2025-07-22 10:25:17:2517 [32minfo[39m: [32mStarting Facebook Ads Bulk Uploader Backend...[39m
+2025-07-22 10:25:17:2517 [32minfo[39m: [32mServer module imported successfully[39m
+2025-07-22 10:25:18:2518 [32minfo[39m: [32mStarting server with configuration:[39m
+2025-07-22 10:25:18:2518 [32minfo[39m: [32mHTTPS Server is running on port[39m
