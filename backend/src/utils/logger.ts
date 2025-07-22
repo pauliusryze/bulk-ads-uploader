@@ -1,5 +1,6 @@
 import winston from 'winston';
 import path from 'path';
+import fs from 'fs';
 
 // Define log levels
 const levels = {
@@ -26,7 +27,7 @@ winston.addColors(colors);
 const level = () => {
   const env = process.env.NODE_ENV || 'development';
   const isDevelopment = env === 'development';
-  return isDevelopment ? 'debug' : 'warn';
+  return isDevelopment ? 'debug' : 'info';
 };
 
 // Define format for logs
@@ -38,22 +39,37 @@ const format = winston.format.combine(
   ),
 );
 
+// Ensure logs directory exists
+const logsDir = path.join(process.cwd(), 'logs');
+if (!fs.existsSync(logsDir)) {
+  try {
+    fs.mkdirSync(logsDir, { recursive: true });
+  } catch (error) {
+    console.warn('Could not create logs directory:', error);
+  }
+}
+
 // Define transports
-const transports = [
-  // Console transport
+const transports: winston.transport[] = [
+  // Console transport (always available)
   new winston.transports.Console(),
-  
-  // File transport for errors
-  new winston.transports.File({
-    filename: path.join(process.cwd(), 'logs', 'error.log'),
-    level: 'error',
-  }),
-  
-  // File transport for all logs
-  new winston.transports.File({
-    filename: path.join(process.cwd(), 'logs', 'combined.log'),
-  }),
 ];
+
+// Add file transports only if logs directory exists and we're not in production
+if (fs.existsSync(logsDir) && process.env.NODE_ENV !== 'production') {
+  transports.push(
+    // File transport for errors
+    new winston.transports.File({
+      filename: path.join(logsDir, 'error.log'),
+      level: 'error',
+    }),
+    
+    // File transport for all logs
+    new winston.transports.File({
+      filename: path.join(logsDir, 'combined.log'),
+    })
+  );
+}
 
 // Create the logger
 export const logger = winston.createLogger({
