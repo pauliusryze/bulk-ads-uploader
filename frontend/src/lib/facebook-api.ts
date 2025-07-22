@@ -312,9 +312,10 @@ class FacebookAPIClient {
               // Check for sandbox/development mode specific errors
               if (userMsg.includes('development mode') || userMsg.includes('sandbox')) {
                 if (this.config.sandboxMode) {
-                  throw new Error('✅ Ad creation successful in sandbox mode! (No real ads will be created - this is expected for testing)');
+                  // In sandbox mode, we should provide a clear message about the limitation
+                  throw new Error('⚠️ Development Mode Limitation: Your Facebook app is in development mode, which prevents ad creation even in sandbox accounts. This is a Facebook platform restriction. To create ads, either: 1) Switch your app to Live mode, or 2) Use a different Facebook app that is in Live mode.');
                 } else {
-                  throw new Error('⚠️ Sandbox/Development Mode: Your app is in development mode and cannot create public ads. This is normal for testing - ads are created successfully but won\'t be published.');
+                  throw new Error('⚠️ Development Mode: Your Facebook app is in development mode and cannot create public ads. Please switch your app to Live mode or continue testing with sandbox accounts.');
                 }
               }
               
