@@ -312,15 +312,13 @@ class FacebookAPIClient {
               // Check for sandbox/development mode specific errors
               if (userMsg.includes('development mode') || userMsg.includes('sandbox')) {
                 if (this.config.sandboxMode) {
-                  // According to Facebook docs, sandbox mode should work regardless of app mode
-                  // This might be a temporary issue or we need to handle it differently
-                  console.log('🏖️ Sandbox mode detected - attempting to proceed with ad creation');
-                  console.log('⚠️ Note: Facebook docs state sandbox should work regardless of app mode');
-                  console.log('🔍 This might be a temporary API issue or configuration problem');
+                  // According to current Facebook documentation (2024-2025), sandbox mode should work
+                  // regardless of app development mode. This suggests a configuration issue.
+                  console.log('🏖️ Sandbox mode detected - this should work per current Facebook docs');
+                  console.log('📖 Reference: Marketing API Sandbox capability now re-enabled (June 2023)');
+                  console.log('🔍 This might be a configuration issue with your Facebook app');
                   
-                  // For sandbox mode, we should try to proceed despite the development mode error
-                  // The Facebook documentation clearly states sandbox should work
-                  throw new Error('⚠️ Sandbox Mode Issue: Your sandbox ad account should work regardless of app development mode (per Facebook docs). This might be a temporary API issue. Please try again or check your sandbox account configuration.');
+                  throw new Error('⚠️ Sandbox Configuration Issue: According to current Facebook documentation, sandbox mode should work regardless of app development mode. This suggests a configuration issue. Please check: 1) Your app is properly configured for sandbox mode in developer.facebook.com, 2) You have the correct permissions (ads_management, pages_manage_ads), 3) Your sandbox ad account is properly set up. Reference: https://developers.facebook.com/blog/post/2023/06/21/marketing-api-sandbox-capability-now-re-enabled/');
                 } else {
                   throw new Error('⚠️ Development Mode: Your Facebook app is in development mode and cannot create public ads. Please switch your app to Live mode or use a sandbox account for testing.');
                 }
@@ -640,6 +638,77 @@ class FacebookAPIClient {
       return { 
         connected: false, 
         error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  // Check app configuration for sandbox mode compatibility
+  async checkAppConfiguration(): Promise<{ 
+    appMode: string; 
+    permissions: string[]; 
+    sandboxEnabled: boolean;
+    recommendations: string[];
+  }> {
+    try {
+      console.log('🔍 Checking app configuration for sandbox compatibility...');
+      
+      // Get app details
+      const appInfo = await this.request<{ 
+        id: string; 
+        name: string; 
+        mode: string;
+        permissions: string[];
+      }>('/me/apps', {
+        method: 'GET',
+      });
+      
+      const recommendations: string[] = [];
+      
+      // Check app mode
+      if (appInfo.mode === 'development') {
+        recommendations.push('✅ App is in development mode (this is fine for sandbox testing)');
+      } else if (appInfo.mode === 'live') {
+        recommendations.push('✅ App is in live mode (this should work for all ad creation)');
+      }
+      
+      // Check permissions
+      const requiredPermissions = ['ads_management', 'pages_manage_ads'];
+      const missingPermissions = requiredPermissions.filter(perm => 
+        !appInfo.permissions.includes(perm)
+      );
+      
+      if (missingPermissions.length > 0) {
+        recommendations.push(`⚠️ Missing permissions: ${missingPermissions.join(', ')}`);
+        recommendations.push('💡 Add these permissions in your Facebook app settings');
+      } else {
+        recommendations.push('✅ All required permissions are present');
+      }
+      
+      // Check if sandbox is enabled
+      const sandboxEnabled = this.config.sandboxMode;
+      if (sandboxEnabled) {
+        recommendations.push('✅ Sandbox mode is enabled in the app');
+      } else {
+        recommendations.push('⚠️ Sandbox mode is not enabled - consider enabling for testing');
+      }
+      
+      return {
+        appMode: appInfo.mode,
+        permissions: appInfo.permissions,
+        sandboxEnabled,
+        recommendations
+      };
+      
+    } catch (error) {
+      console.error('❌ Error checking app configuration:', error);
+      return {
+        appMode: 'unknown',
+        permissions: [],
+        sandboxEnabled: this.config.sandboxMode,
+        recommendations: [
+          '❌ Could not check app configuration',
+          '💡 Please verify your app settings manually in developer.facebook.com'
+        ]
       };
     }
   }
