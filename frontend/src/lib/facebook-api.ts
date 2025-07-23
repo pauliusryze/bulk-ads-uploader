@@ -906,7 +906,7 @@ class FacebookAPIClient {
       // Check 1: Access Token Validation
       console.log('🔍 Check 1: Validating access token...');
       try {
-        const tokenInfo = await this.request<{ id: string; name: string; permissions: string[] }>('/me', {
+        const tokenInfo = await this.request<{ id: string; name: string }>('/me', {
           method: 'GET',
         });
         
@@ -917,30 +917,47 @@ class FacebookAPIClient {
           details: { userId: tokenInfo.id, userName: tokenInfo.name }
         });
         
-        // Check permissions
-        const requiredPermissions = ['ads_management', 'pages_manage_ads'];
-        const missingPermissions = requiredPermissions.filter(perm => 
-          !tokenInfo.permissions.includes(perm)
-        );
-        
-        if (missingPermissions.length > 0) {
-          checks.push({
-            name: 'User Permissions',
-            status: 'fail',
-            message: `❌ Missing required permissions: ${missingPermissions.join(', ')}`,
-            details: { 
-              required: requiredPermissions, 
-              current: tokenInfo.permissions,
-              missing: missingPermissions 
-            }
+        // Check permissions using the correct endpoint
+        try {
+          const permissionsInfo = await this.request<{ data: Array<{ permission: string; status: string }> }>('/me/permissions', {
+            method: 'GET',
           });
-          recommendations.push('💡 Re-authenticate with Facebook to grant missing permissions');
-        } else {
+          
+          const userPermissions = permissionsInfo.data
+            .filter(p => p.status === 'granted')
+            .map(p => p.permission);
+          
+          const requiredPermissions = ['ads_management', 'pages_manage_ads'];
+          const missingPermissions = requiredPermissions.filter(perm => 
+            !userPermissions.includes(perm)
+          );
+          
+          if (missingPermissions.length > 0) {
+            checks.push({
+              name: 'User Permissions',
+              status: 'fail',
+              message: `❌ Missing required permissions: ${missingPermissions.join(', ')}`,
+              details: { 
+                required: requiredPermissions, 
+                current: userPermissions,
+                missing: missingPermissions 
+              }
+            });
+            recommendations.push('💡 Re-authenticate with Facebook to grant missing permissions');
+          } else {
+            checks.push({
+              name: 'User Permissions',
+              status: 'pass',
+              message: '✅ All required permissions are present',
+              details: { permissions: userPermissions }
+            });
+          }
+        } catch (permissionsError) {
           checks.push({
             name: 'User Permissions',
-            status: 'pass',
-            message: '✅ All required permissions are present',
-            details: { permissions: tokenInfo.permissions }
+            status: 'warning',
+            message: '⚠️ Could not verify permissions (this might be expected)',
+            details: { error: permissionsError instanceof Error ? permissionsError.message : 'Unknown error' }
           });
         }
         
@@ -962,7 +979,7 @@ class FacebookAPIClient {
           id: string; 
           name: string; 
           mode: string;
-          permissions: string[];
+          permissions?: string[];
         }>('/me/apps', {
           method: 'GET',
         });
@@ -976,30 +993,39 @@ class FacebookAPIClient {
           details: { appId: appInfo.id, appName: appInfo.name, mode: appInfo.mode }
         });
         
-        // Check app permissions
-        const appRequiredPermissions = ['ads_management', 'pages_manage_ads'];
-        const appMissingPermissions = appRequiredPermissions.filter(perm => 
-          !appInfo.permissions.includes(perm)
-        );
-        
-        if (appMissingPermissions.length > 0) {
-          checks.push({
-            name: 'App Permissions',
-            status: 'fail',
-            message: `❌ App missing permissions: ${appMissingPermissions.join(', ')}`,
-            details: { 
-              required: appRequiredPermissions, 
-              current: appInfo.permissions,
-              missing: appMissingPermissions 
-            }
-          });
-          recommendations.push('💡 Add missing permissions in your Facebook app settings at developer.facebook.com');
+        // Check app permissions if available
+        if (appInfo.permissions && Array.isArray(appInfo.permissions)) {
+          const appRequiredPermissions = ['ads_management', 'pages_manage_ads'];
+          const appMissingPermissions = appRequiredPermissions.filter(perm => 
+            !appInfo.permissions!.includes(perm)
+          );
+          
+          if (appMissingPermissions.length > 0) {
+            checks.push({
+              name: 'App Permissions',
+              status: 'fail',
+              message: `❌ App missing permissions: ${appMissingPermissions.join(', ')}`,
+              details: { 
+                required: appRequiredPermissions, 
+                current: appInfo.permissions,
+                missing: appMissingPermissions 
+              }
+            });
+            recommendations.push('💡 Add missing permissions in your Facebook app settings at developer.facebook.com');
+          } else {
+            checks.push({
+              name: 'App Permissions',
+              status: 'pass',
+              message: '✅ App has all required permissions',
+              details: { permissions: appInfo.permissions }
+            });
+          }
         } else {
           checks.push({
             name: 'App Permissions',
-            status: 'pass',
-            message: '✅ App has all required permissions',
-            details: { permissions: appInfo.permissions }
+            status: 'warning',
+            message: '⚠️ Could not verify app permissions (this might be expected)',
+            details: { note: 'App permissions not available in response' }
           });
         }
         
