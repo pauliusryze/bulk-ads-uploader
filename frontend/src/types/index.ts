@@ -22,8 +22,11 @@ export interface BulkAdItem {
   advantagePlusEnhancements: AdvantagePlusEnhancements;
   pixelId: string;
   urlParams: string;
-  bidStrategy: 'LOWEST_COST_WITHOUT_CAP' | 'LOWEST_COST_WITH_BID_CAP' | 'COST_CAP' | 'BID_CAP' | 'ABSOLUTE_OCPM';
+  bidStrategy: 'LOWEST_COST_WITHOUT_CAP' | 'LOWEST_COST_WITH_BID_CAP' | 'COST_CAP' | 'BID_CAP' | 'ABSOLUTE_OCPM' | 'LOWEST_COST_WITH_MIN_ROAS';
   bidAmount?: number;
+  bidConstraints?: {
+    roasAverageFloor?: number; // For LOWEST_COST_WITH_MIN_ROAS (scaled up 10000x)
+  };
 }
 
 // Facebook Campaign Interface

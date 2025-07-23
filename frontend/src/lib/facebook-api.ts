@@ -19,9 +19,12 @@ export interface FacebookAdSetData {
   campaign_id: string;
   daily_budget: number;
   billing_event: 'IMPRESSIONS' | 'LINK_CLICKS' | 'THRUPLAY'; // Added THRUPLAY for video ads
-  optimization_goal: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS' | 'THRUPLAY' | 'OUTCOME_TRAFFIC' | 'OUTCOME_ENGAGEMENT' | 'OUTCOME_LEADS' | 'OUTCOME_SALES' | 'OUTCOME_APP_PROMOTION';
-  bid_strategy?: 'LOWEST_COST_WITHOUT_CAP' | 'LOWEST_COST_WITH_BID_CAP' | 'COST_CAP' | 'BID_CAP' | 'ABSOLUTE_OCPM';
+  optimization_goal: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS' | 'THRUPLAY' | 'OUTCOME_TRAFFIC' | 'OUTCOME_ENGAGEMENT' | 'OUTCOME_LEADS' | 'OUTCOME_SALES' | 'OUTCOME_APP_PROMOTION' | 'VALUE';
+  bid_strategy?: 'LOWEST_COST_WITHOUT_CAP' | 'LOWEST_COST_WITH_BID_CAP' | 'COST_CAP' | 'BID_CAP' | 'ABSOLUTE_OCPM' | 'LOWEST_COST_WITH_MIN_ROAS';
   bid_amount?: number;
+  bid_constraints?: {
+    roas_average_floor?: number; // For LOWEST_COST_WITH_MIN_ROAS (scaled up 10000x)
+  };
   targeting: {
     // Device and platform targeting (as per Facebook docs)
     device_platforms?: ('desktop' | 'mobile' | 'connected_tv')[];

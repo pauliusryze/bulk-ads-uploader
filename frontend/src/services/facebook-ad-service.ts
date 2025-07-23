@@ -47,8 +47,9 @@ export class FacebookAdService {
     campaignId: string,
     adSetName: string,
     budget: number,
-    bidStrategy?: 'LOWEST_COST_WITHOUT_CAP' | 'LOWEST_COST_WITH_BID_CAP' | 'COST_CAP' | 'BID_CAP' | 'ABSOLUTE_OCPM',
-    bidAmount?: number
+    bidStrategy?: 'LOWEST_COST_WITHOUT_CAP' | 'LOWEST_COST_WITH_BID_CAP' | 'COST_CAP' | 'BID_CAP' | 'ABSOLUTE_OCPM' | 'LOWEST_COST_WITH_MIN_ROAS',
+    bidAmount?: number,
+    bidConstraints?: { roasAverageFloor?: number }
   ): FacebookAdSetData {
     // Convert locations to modern format (EnhancedTargeting uses string arrays)
     const geoLocations = template.targeting.locations?.inclusion?.length > 0 ? {
@@ -226,6 +227,9 @@ export class FacebookAdService {
       optimization_goal: template.optimizationGoal || 'LINK_CLICKS',
       bid_strategy: bidStrategy || 'LOWEST_COST_WITHOUT_CAP',
       bid_amount: bidAmount ? bidAmount * 100 : undefined, // Convert to cents
+      bid_constraints: bidConstraints ? {
+        roas_average_floor: bidConstraints.roasAverageFloor
+      } : undefined, // Convert camelCase to snake_case
       targeting,
       status: 'PAUSED', // Always create in paused status for safety
       special_ad_categories: template.specialAdCategories || [],
@@ -594,7 +598,8 @@ export class FacebookAdService {
               adItem.adSetName,
               budget,
               adItem.bidStrategy,
-              adItem.bidAmount
+              adItem.bidAmount,
+              adItem.bidConstraints // Pass bid constraints
             );
             
             // Debug: Log the ad set data being sent to Facebook

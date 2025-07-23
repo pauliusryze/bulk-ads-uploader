@@ -164,6 +164,7 @@ export function AdRow({ ad, campaigns, facebookPages, instagramPages, pixels, te
               <option value="COST_CAP">Cost Cap</option>
               <option value="BID_CAP">Bid Cap</option>
               <option value="ABSOLUTE_OCPM">Absolute oCPM</option>
+              <option value="LOWEST_COST_WITH_MIN_ROAS">Lowest Cost with Min ROAS</option>
             </select>
           </div>
 
@@ -182,6 +183,33 @@ export function AdRow({ ad, campaigns, facebookPages, instagramPages, pixels, te
                 min="0"
                 step="0.01"
               />
+            </div>
+          )}
+
+          {/* ROAS Average Floor - Only show for LOWEST_COST_WITH_MIN_ROAS */}
+          {ad.bidStrategy === 'LOWEST_COST_WITH_MIN_ROAS' && (
+            <div className="space-y-2">
+              <Label>Minimum ROAS (e.g., 1.5 = 150%)</Label>
+              <Input
+                type="number"
+                value={ad.bidConstraints?.roasAverageFloor ? (ad.bidConstraints.roasAverageFloor / 10000) : ''}
+                onChange={(e) => {
+                  const roasValue = e.target.value ? parseFloat(e.target.value) : undefined;
+                  const scaledValue = roasValue ? Math.round(roasValue * 10000) : undefined;
+                  handleFieldChange('bidConstraints', { 
+                    ...ad.bidConstraints, 
+                    roasAverageFloor: scaledValue 
+                  });
+                }}
+                placeholder="1.5"
+                min="0.01"
+                max="1000"
+                step="0.01"
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter the minimum return on ad spend (ROAS) you want to achieve. 
+                For example, 1.5 means you want at least 150% return on your ad spend.
+              </p>
             </div>
           )}
 

@@ -466,7 +466,8 @@ function DashboardContent() {
             pixelId: '',
             urlParams: '',
             bidStrategy: 'LOWEST_COST_WITHOUT_CAP',
-            bidAmount: undefined
+            bidAmount: undefined,
+            bidConstraints: undefined
           };
 
           newAdItems.push(adItem);
@@ -3044,6 +3045,7 @@ function DashboardContent() {
                                       <SelectItem value="LOWEST_COST_WITH_BID_CAP">Lowest Cost with Bid Cap</SelectItem>
                                       <SelectItem value="COST_CAP">Cost Cap</SelectItem>
                                       <SelectItem value="BID_CAP">Bid Cap</SelectItem>
+                                      <SelectItem value="LOWEST_COST_WITH_MIN_ROAS">Lowest Cost with Min ROAS</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -3068,6 +3070,38 @@ function DashboardContent() {
                                         }));
                                       }}
                                       placeholder="1.00"
+                                      className="text-xs"
+                                    />
+                                  </div>
+                                )}
+
+                                {/* ROAS Average Floor (conditional) */}
+                                {item.bidStrategy === 'LOWEST_COST_WITH_MIN_ROAS' && (
+                                  <div className="space-y-1">
+                                    <Label className="text-xs font-medium">Min ROAS (e.g., 1.5 = 150%)</Label>
+                                    <Input
+                                      type="number"
+                                      min="0.01"
+                                      max="1000"
+                                      step="0.01"
+                                      value={item.bidConstraints?.roasAverageFloor ? (item.bidConstraints.roasAverageFloor / 10000) : ''}
+                                      onChange={(e) => {
+                                        const roasValue = e.target.value ? parseFloat(e.target.value) : undefined;
+                                        const scaledValue = roasValue ? Math.round(roasValue * 10000) : undefined;
+                                        setBulkAdsForm(prev => ({
+                                          ...prev,
+                                          adItems: prev.adItems.map(ad => 
+                                            ad.id === item.id ? { 
+                                              ...ad, 
+                                              bidConstraints: { 
+                                                ...ad.bidConstraints, 
+                                                roasAverageFloor: scaledValue 
+                                              } 
+                                            } : ad
+                                          )
+                                        }));
+                                      }}
+                                      placeholder="1.5"
                                       className="text-xs"
                                     />
                                   </div>
