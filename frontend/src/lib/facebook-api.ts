@@ -1644,7 +1644,7 @@ class FacebookAPIClient {
     });
   }
 
-  // Upload media using Facebook Marketing API (for ad creatives)
+  // Upload media using Facebook Video Ads API (4-step process)
   async uploadMedia(adAccountId: string, file: File): Promise<{ id: string; hash: string }> {
     // In development mode, return mock data
     if (this.isDevelopmentMode) {
@@ -1655,7 +1655,7 @@ class FacebookAPIClient {
       };
     }
 
-    console.log("🔍 Uploading media for ad creatives:", {
+    console.log("🔍 Starting Facebook Video Ads API upload process:", {
       filename: file.name,
       size: file.size,
       type: file.type,
@@ -1663,54 +1663,112 @@ class FacebookAPIClient {
     });
 
     try {
-      // Use Marketing API endpoints for ad creatives
-      const endpoint = file.type.startsWith("video/") 
-        ? `/${adAccountId}/advideos`  // For video ad creatives
-        : `/${adAccountId}/adimages`; // For image ad creatives
-
-      // Create form data (this will be converted to proper format by our request method)
-      const uploadData = {
-        source: file,
-        name: file.name
-      };
-
-      console.log("📤 Uploading to Marketing API endpoint:", endpoint);
-      
-      const result = await this.request<{ id: string; images?: any; status?: any }>(endpoint, {
-        method: 'POST',
-        body: JSON.stringify(uploadData), // This will be converted to form data by our request method
-      });
-
-      console.log("✅ Marketing API upload success:", result);
-
-      // Handle different response formats
-      if (file.type.startsWith("video/")) {
-        console.log("🎥 Video uploaded for ad creative - ID:", result.id);
-        
-        // Check if video is still processing
-        if (result.status && result.status.video_status === 'PROCESSING') {
-          console.warn("⚠️ Video is still processing. This might cause issues with ad creation.");
-        }
-        
-        return {
-          id: result.id,
-          hash: result.id // For videos, use ID as hash
-        };
-      } else {
-        // For images, Facebook returns { images: { filename: { hash: "..." } } }
-        const imageData = result.images && result.images[Object.keys(result.images)[0]];
-        console.log("🖼️ Image uploaded for ad creative - Hash:", imageData?.hash);
-        
-        return {
-          id: imageData?.hash || result.id,
-          hash: imageData?.hash || result.id
-        };
+      // For images, use the old Marketing API approach
+      if (!file.type.startsWith("video/")) {
+        console.log("🖼️ Using Marketing API for image upload...");
+        return this.uploadImageViaMarketingAPI(adAccountId, file);
       }
 
+      // For videos, use the new Video Ads API (4-step process)
+      console.log("🎥 Using Video Ads API for video upload...");
+      return this.uploadVideoViaVideoAdsAPI(adAccountId, file);
+
     } catch (error) {
-      console.error("❌ Marketing API upload failed:", error);
+      console.error("❌ Media upload failed:", error);
       throw error;
     }
+  }
+
+  // Upload image using Marketing API (legacy approach)
+  private async uploadImageViaMarketingAPI(adAccountId: string, file: File): Promise<{ id: string; hash: string }> {
+    const uploadData = {
+      source: file,
+      name: file.name
+    };
+
+    const result = await this.request<{ id: string; images?: any }>(`/${adAccountId}/adimages`, {
+      method: 'POST',
+      body: JSON.stringify(uploadData),
+    });
+
+    const imageData = result.images && result.images[Object.keys(result.images)[0]];
+    console.log("🖼️ Image uploaded via Marketing API - Hash:", imageData?.hash);
+    
+    return {
+      id: imageData?.hash || result.id,
+      hash: imageData?.hash || result.id
+    };
+  }
+
+  // Upload video using Video Ads API (4-step process)
+  private async uploadVideoViaVideoAdsAPI(adAccountId: string, file: File): Promise<{ id: string; hash: string }> {
+    // Step 1: Initialize upload session
+    console.log("📤 Step 1: Initializing video upload session...");
+    const initData = {
+      upload_phase: 'start'
+    };
+
+    const initResponse = await this.request<{ video_id: string; upload_url: string }>(`/${adAccountId}/video_ads`, {
+      method: 'POST',
+      body: JSON.stringify(initData),
+    });
+
+    const videoId = initResponse.video_id;
+    const uploadUrl = initResponse.upload_url;
+    console.log("✅ Upload session initialized:", { videoId, uploadUrl });
+
+    // Step 2: Upload the video file
+    console.log("📤 Step 2: Uploading video file...");
+    const uploadResponse = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `OAuth ${this.config.accessToken}`,
+        'offset': '0',
+        'file_size': file.size.toString()
+      },
+      body: file
+    });
+
+    if (!uploadResponse.ok) {
+      let errorMessage = `Upload failed: HTTP ${uploadResponse.status}`;
+      try {
+        const error = await uploadResponse.json();
+        errorMessage = error.error?.message || errorMessage;
+      } catch (parseError) {
+        console.error("❌ Failed to parse upload error response");
+      }
+      throw new Error(errorMessage);
+    }
+
+    const uploadResult = await uploadResponse.json();
+    console.log("✅ Video file upload completed:", uploadResult);
+
+    // Step 3: Check upload status (optional but recommended)
+    console.log("📊 Step 3: Checking upload status...");
+    const statusResponse = await this.request<{ status: any }>(`/${videoId}?fields=status`, {
+      method: 'GET',
+    });
+
+    console.log("📊 Upload status:", statusResponse.status);
+
+    // Step 4: Publish video to ad account
+    console.log("📤 Step 4: Publishing video to ad account...");
+    const publishData = {
+      upload_phase: 'finish',
+      video_id: videoId
+    };
+
+    const publishResponse = await this.request<{ success: boolean }>(`/${adAccountId}/video_ads`, {
+      method: 'POST',
+      body: JSON.stringify(publishData),
+    });
+
+    console.log("✅ Video published to ad account:", publishResponse);
+
+    return {
+      id: videoId,
+      hash: videoId // For videos, use ID as hash
+    };
   }
 
   // Create campaign
@@ -1804,7 +1862,7 @@ class FacebookAPIClient {
     });
   }
 
-  // Check video processing status
+  // Check video processing status using Video Ads API
   async checkVideoStatus(videoId: string): Promise<{ status: string; processing_status?: string }> {
     if (this.isDevelopmentMode) {
       console.log("Development mode: Mock video status check for", videoId);
@@ -1813,12 +1871,32 @@ class FacebookAPIClient {
 
     console.log("🔍 Checking video status for:", videoId);
     
-    const result = await this.request<{ status: string; processing_status?: string }>(`/${videoId}`, {
-      method: 'GET',
-    });
-    
-    console.log("🔍 Video status result:", result);
-    return result;
+    try {
+      const result = await this.request<{ 
+        status: {
+          video_status: string;
+          uploading_phase: { status: string; bytes_transfered?: number };
+          processing_phase: { status: string };
+          publishing_phase: { status: string };
+        }
+      }>(`/${videoId}?fields=status`, {
+        method: 'GET',
+      });
+      
+      console.log("🔍 Video status result:", result);
+      
+      // Map the complex status to a simple format
+      const videoStatus = result.status.video_status;
+      const processingStatus = result.status.processing_phase.status;
+      
+      return {
+        status: videoStatus,
+        processing_status: processingStatus
+      };
+    } catch (error) {
+      console.error("❌ Error checking video status:", error);
+      throw error;
+    }
   }
 
   // Batch requests as recommended by Facebook's Graph API documentation
