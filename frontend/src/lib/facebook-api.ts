@@ -261,7 +261,10 @@ class FacebookAPIClient {
       
       // Convert JSON body to form data format
       Object.entries(bodyData).forEach(([key, value]) => {
-        if (typeof value === 'object' && value !== null) {
+        if (value instanceof File) {
+          // Handle File objects directly
+          formData.append(key, value);
+        } else if (typeof value === 'object' && value !== null) {
           // For nested objects like object_story_spec, stringify them
           formData.append(key, JSON.stringify(value));
         } else {
@@ -1641,7 +1644,7 @@ class FacebookAPIClient {
     });
   }
 
-  // Upload media to Facebook
+  // Upload media using Facebook Marketing API (for ad creatives)
   async uploadMedia(adAccountId: string, file: File): Promise<{ id: string; hash: string }> {
     // In development mode, return mock data
     if (this.isDevelopmentMode) {
@@ -1652,72 +1655,61 @@ class FacebookAPIClient {
       };
     }
 
-    console.log("🔍 Uploading media to Facebook:", {
+    console.log("🔍 Uploading media for ad creatives:", {
       filename: file.name,
       size: file.size,
       type: file.type,
       adAccountId: adAccountId
     });
 
-    const formData = new FormData();
-    formData.append("source", file);
-    
-    // Use different endpoints for images vs videos
-    const endpoint = file.type.startsWith("video/") 
-      ? `/${adAccountId}/advideos`  // For videos
-      : `/${adAccountId}/adimages`; // For images
+    try {
+      // Use Marketing API endpoints for ad creatives
+      const endpoint = file.type.startsWith("video/") 
+        ? `/${adAccountId}/advideos`  // For video ad creatives
+        : `/${adAccountId}/adimages`; // For image ad creatives
 
-    const url = `${this.baseUrl}${endpoint}?access_token=${this.config.accessToken}`;
-    console.log("🔍 Facebook API URL:", url);
-
-    const response = await fetch(url, {
-      method: "POST",
-      body: formData,
-      // Dont set Content-Type - let browser set it for FormData
-    });
-
-    console.log("🔍 Facebook API Response Status:", response.status);
-
-    if (!response.ok) {
-      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-      try {
-        const error: FacebookAPIError = await response.json();
-        errorMessage = error.error.message;
-        console.error("❌ Facebook media upload error:", error);
-      } catch (parseError) {
-        console.error("❌ Failed to parse Facebook error response");
-      }
-      throw new Error(errorMessage);
-    }
-
-    const result = await response.json();
-    console.log("✅ Facebook media upload success - Full response:", result);
-    console.log("✅ Facebook media upload success - Response keys:", Object.keys(result));
-    
-    // Facebook returns different response formats for images vs videos
-    if (file.type.startsWith("video/")) {
-      console.log("🔍 Processing video response - Video ID:", result.id);
-      console.log("🔍 Processing video response - Video status:", result.status);
-      console.log("🔍 Processing video response - Video processing status:", result.processing_status);
-      
-      // Check if video is still processing
-      if (result.status && result.status.video_status === 'PROCESSING') {
-        console.warn("⚠️ Video is still processing. This might cause issues with ad creation.");
-      }
-      
-      return {
-        id: result.id,
-        hash: result.id // For videos, use ID as hash
+      // Create form data (this will be converted to proper format by our request method)
+      const uploadData = {
+        source: file,
+        name: file.name
       };
-    } else {
-      // For images, Facebook returns { images: { filename: { hash: "..." } } }
-      const imageData = result.images && result.images[Object.keys(result.images)[0]];
-      console.log("🔍 Processing image response - Image hash:", imageData?.hash);
+
+      console.log("📤 Uploading to Marketing API endpoint:", endpoint);
       
-      return {
-        id: imageData?.hash || result.id,
-        hash: imageData?.hash || result.id
-      };
+      const result = await this.request<{ id: string; images?: any; status?: any }>(endpoint, {
+        method: 'POST',
+        body: JSON.stringify(uploadData), // This will be converted to form data by our request method
+      });
+
+      console.log("✅ Marketing API upload success:", result);
+
+      // Handle different response formats
+      if (file.type.startsWith("video/")) {
+        console.log("🎥 Video uploaded for ad creative - ID:", result.id);
+        
+        // Check if video is still processing
+        if (result.status && result.status.video_status === 'PROCESSING') {
+          console.warn("⚠️ Video is still processing. This might cause issues with ad creation.");
+        }
+        
+        return {
+          id: result.id,
+          hash: result.id // For videos, use ID as hash
+        };
+      } else {
+        // For images, Facebook returns { images: { filename: { hash: "..." } } }
+        const imageData = result.images && result.images[Object.keys(result.images)[0]];
+        console.log("🖼️ Image uploaded for ad creative - Hash:", imageData?.hash);
+        
+        return {
+          id: imageData?.hash || result.id,
+          hash: imageData?.hash || result.id
+        };
+      }
+
+    } catch (error) {
+      console.error("❌ Marketing API upload failed:", error);
+      throw error;
     }
   }
 
