@@ -4,7 +4,7 @@ import FacebookAPIClient, {
   FacebookCreativeData,
   FacebookAdData,
 } from '../lib/facebook-api';
-import { EnhancedAdTemplate, BulkAdItem } from '../types';
+import { EnhancedAdTemplate, BulkAdItem, AdvantagePlusEnhancements } from '../types';
 
 export interface BulkAdCreationResult {
   campaignId: string;
@@ -317,7 +317,8 @@ export class FacebookAdService {
           primaryText: template.adCopy.primaryText,
           headline: template.adCopy.headline,
           callToAction: template.adCopy.callToAction,
-          landingPageUrl: adItem.landingPageUrl
+          landingPageUrl: adItem.landingPageUrl,
+          advantagePlusEnhancements: adItem.advantagePlusEnhancements
         });
         
         // VALIDATE VIDEO PARAMETERS BEFORE CREATING CREATIVE
@@ -359,6 +360,8 @@ export class FacebookAdService {
               },
             },
           },
+          // Map Advantage+ enhancements to Facebook's degrees_of_freedom_spec
+          degrees_of_freedom_spec: this.mapAdvantagePlusToDegreesOfFreedom(adItem.advantagePlusEnhancements)
         };
         
         console.log('🔍 Creating video creative with data:', JSON.stringify(videoCreative, null, 2));
@@ -383,6 +386,8 @@ export class FacebookAdService {
               },
             },
           },
+          // Map Advantage+ enhancements to Facebook's degrees_of_freedom_spec
+          degrees_of_freedom_spec: this.mapAdvantagePlusToDegreesOfFreedom(adItem.advantagePlusEnhancements)
         };
       }
     } else {
@@ -404,8 +409,30 @@ export class FacebookAdService {
           page_id: pageId,
           link_data: linkData,
         },
+        // Map Advantage+ enhancements to Facebook's degrees_of_freedom_spec
+        degrees_of_freedom_spec: this.mapAdvantagePlusToDegreesOfFreedom(adItem.advantagePlusEnhancements)
       };
     }
+  }
+
+  // Helper method to map Advantage+ enhancements to Facebook's degrees_of_freedom_spec
+  private mapAdvantagePlusToDegreesOfFreedom(enhancements: AdvantagePlusEnhancements) {
+    // If any Advantage+ enhancement is enabled, enable Standard Enhancements
+    const hasAnyEnhancement = Object.values(enhancements).some(enabled => enabled);
+    
+    if (hasAnyEnhancement) {
+      console.log('🎨 Mapping Advantage+ enhancements to Facebook Standard Enhancements:', enhancements);
+      return {
+        creative_features_spec: {
+          standard_enhancements: {
+            enroll_status: 'OPT_IN' as const // Enable Standard Enhancements when any Advantage+ feature is enabled
+          }
+        }
+      };
+    }
+    
+    // If no Advantage+ enhancements are enabled, don't include degrees_of_freedom_spec
+    return undefined;
   }
 
   // Map ad item to Facebook ad data

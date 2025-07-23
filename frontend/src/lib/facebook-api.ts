@@ -118,6 +118,14 @@ export interface FacebookCreativeData {
       };
     };
   };
+  // New field for Standard Enhancements (Facebook's latest feature)
+  degrees_of_freedom_spec?: {
+    creative_features_spec: {
+      standard_enhancements: {
+        enroll_status: 'OPT_IN' | 'OPT_OUT';
+      };
+    };
+  };
 }
 
 export interface FacebookAdData {
@@ -1811,13 +1819,29 @@ class FacebookAPIClient {
       console.log('📖 Reference: https://developers.facebook.com/ads/blog/post/v2/2016/10/19/sandbox-ad-accounts/');
     }
     
+    // Add Standard Enhancements by default for better performance (unless explicitly disabled)
+    const creativeData = {
+      ...data,
+      degrees_of_freedom_spec: data.degrees_of_freedom_spec || {
+        creative_features_spec: {
+          standard_enhancements: {
+            enroll_status: 'OPT_IN' // Enable Standard Enhancements by default
+          }
+        }
+      }
+    };
+    
+    console.log('🎨 Creative data with Standard Enhancements:', JSON.stringify(creativeData, null, 2));
+    
     const result = await this.request<{ id: string }>(`/${adAccountId}/adcreatives`, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(creativeData),
     });
     
     if (isSandbox) {
       console.log('✅ Creative created successfully in sandbox mode (no real ads will be published)');
+    } else {
+      console.log('✅ Creative created successfully with Standard Enhancements enabled');
     }
     
     return result;
