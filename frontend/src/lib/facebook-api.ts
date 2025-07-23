@@ -18,23 +18,29 @@ export interface FacebookAdSetData {
   name: string;
   campaign_id: string;
   daily_budget: number;
-  billing_event: 'IMPRESSIONS' | 'LINK_CLICKS';
-  optimization_goal: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS' | 'OUTCOME_TRAFFIC' | 'OUTCOME_ENGAGEMENT' | 'OUTCOME_LEADS' | 'OUTCOME_SALES' | 'OUTCOME_APP_PROMOTION';
+  billing_event: 'IMPRESSIONS' | 'LINK_CLICKS' | 'THRUPLAY'; // Added THRUPLAY for video ads
+  optimization_goal: 'LINK_CLICKS' | 'CONVERSIONS' | 'REACH' | 'BRAND_AWARENESS' | 'VIDEO_VIEWS' | 'THRUPLAY' | 'OUTCOME_TRAFFIC' | 'OUTCOME_ENGAGEMENT' | 'OUTCOME_LEADS' | 'OUTCOME_SALES' | 'OUTCOME_APP_PROMOTION';
   bid_strategy?: 'LOWEST_COST_WITHOUT_CAP' | 'LOWEST_COST_WITH_BID_CAP' | 'COST_CAP' | 'BID_CAP' | 'ABSOLUTE_OCPM';
   bid_amount?: number;
   targeting: {
-    // Modern targeting fields (replacing deprecated ones)
-    age_min?: number;
-    age_max?: number;
-    genders?: number[];
+    // Device and platform targeting (as per Facebook docs)
+    device_platforms?: ('desktop' | 'mobile' | 'connected_tv')[];
+    publisher_platforms?: ('facebook' | 'instagram' | 'audience_network' | 'messenger')[];
+    facebook_positions?: ('feed' | 'instant_article' | 'marketplace' | 'video_feeds' | 'story' | 'reels' | 'right_hand_column')[];
+    instagram_positions?: ('story' | 'feed' | 'explore' | 'reels')[];
     
-    // Updated geo targeting structure
+    // Geo targeting (as per Facebook docs)
     geo_locations?: {
       countries?: string[];
       regions?: Array<{ key: string; name: string }>;
       cities?: Array<{ key: string; name: string; radius: number; distance_unit: 'mile' | 'kilometer' }>;
       zips?: Array<{ key: string; name: string }>;
     };
+    
+    // Demographics targeting
+    age_min?: number;
+    age_max?: number;
+    genders?: number[];
     
     // Modern audience targeting
     custom_audiences?: Array<{ id: string; name?: string }>;
@@ -56,16 +62,8 @@ export interface FacebookAdSetData {
     behaviors?: Array<{ id: string; name: string }>;
     excluded_behaviors?: Array<{ id: string; name: string }>;
     
-    // Placement targeting
-    publisher_platforms?: ('facebook' | 'instagram' | 'audience_network' | 'messenger')[];
-    facebook_positions?: ('feed' | 'instant_article' | 'marketplace' | 'video_feeds' | 'story' | 'reels')[];
-    instagram_positions?: ('story' | 'feed' | 'explore' | 'reels')[];
-    
     // Language targeting
     locales?: number[];
-    
-    // Device targeting
-    device_platforms?: ('desktop' | 'mobile' | 'connected_tv')[];
     
     // Exclusions (new field)
     exclusions?: {
@@ -109,8 +107,9 @@ export interface FacebookCreativeData {
       };
     };
     video_data?: {
+      image_url?: string; // Required thumbnail URL for video creatives
       video_id: string;
-      message: string;
+      message?: string; // Optional for video creatives
       call_to_action?: {
         type: 'SHOP_NOW' | 'LEARN_MORE' | 'SIGN_UP' | 'BOOK_NOW' | 'CONTACT_US';
         value: {
@@ -206,13 +205,16 @@ class FacebookAPIClient {
       type: this.config.accessToken.startsWith('EAA') ? 'User Token' : 'Unknown'
     });
     
-    const params = new URLSearchParams({
-      access_token: this.config.accessToken,
-    });
-
-    // Check if endpoint already has query parameters
-    const separator = endpoint.includes('?') ? '&' : '?';
-    const fullUrl = `${url}${separator}${params}`;
+    // For GET requests, add access token to URL
+    // For POST requests, access token will be in form data
+    let fullUrl = url;
+    if (!options.method || options.method === 'GET') {
+      const params = new URLSearchParams({
+        access_token: this.config.accessToken,
+      });
+      const separator = endpoint.includes('?') ? '&' : '?';
+      fullUrl = `${url}${separator}${params}`;
+    }
     
     // IMMEDIATE DEBUGGING - Log what we're about to send
     console.log('🚀 Facebook API Request:', {
@@ -235,7 +237,7 @@ class FacebookAPIClient {
         // Check specific video parameters
         if (parsedBody.object_story_spec?.video_data) {
           console.log('🎥 Video Data:', parsedBody.object_story_spec.video_data);
-          console.log('🎥 Video ID:', parsedBody.object_story_spec.video_data.video_id);
+          console.log('�� Video ID:', parsedBody.object_story_spec.video_data.video_id);
           console.log('🎥 Page ID:', parsedBody.object_story_spec.page_id);
         }
       }
@@ -243,13 +245,42 @@ class FacebookAPIClient {
     
     const config: RequestInit = {
       headers: {
-        'Content-Type': 'application/json',
         'User-Agent': 'FacebookAdsUploader/1.0',
         ...options.headers,
       },
       ...options,
     };
 
+    // For POST requests, use form data format as required by Facebook API
+    if (options.method === 'POST' && options.body) {
+      const bodyData = JSON.parse(options.body as string);
+      const formData = new FormData();
+      
+      // Add access token to form data
+      formData.append('access_token', this.config.accessToken);
+      
+      // Convert JSON body to form data format
+      Object.entries(bodyData).forEach(([key, value]) => {
+        if (typeof value === 'object' && value !== null) {
+          // For nested objects like object_story_spec, stringify them
+          formData.append(key, JSON.stringify(value));
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      
+      // Replace the body with form data
+      config.body = formData;
+      
+      // Remove Content-Type header to let browser set it with boundary
+      if (config.headers) {
+        delete (config.headers as any)['Content-Type'];
+      }
+      
+      console.log('📝 Converting to form data format for Facebook API');
+      console.log('📝 Form data entries:', Array.from(formData.entries()));
+    }
+    
     try {
       // Add timeout to prevent hanging requests
       const controller = new AbortController();
