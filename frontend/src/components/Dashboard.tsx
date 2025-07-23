@@ -99,6 +99,48 @@ function DashboardContent() {
   const [locationSearchTerm, setLocationSearchTerm] = useState('');
   const [locations, setLocations] = useState<FacebookLocation[]>([]);
 
+  // Add troubleshooting functionality
+  const [troubleshootingResult, setTroubleshootingResult] = useState<any>(null);
+  const [isTroubleshooting, setIsTroubleshooting] = useState(false);
+
+  const runTroubleshooting = async () => {
+    if (!apiClient) {
+      alert('Please connect to Facebook first');
+      return;
+    }
+
+    setIsTroubleshooting(true);
+    setTroubleshootingResult(null);
+
+    try {
+      console.log('🔍 Starting comprehensive troubleshooting...');
+      
+      // Run configuration troubleshooting
+      const configResult = await apiClient.troubleshootConfiguration();
+      console.log('📊 Configuration troubleshooting result:', configResult);
+      
+      // If configuration looks good, test ad creation process
+      let adTestResult = null;
+      if (configResult.status !== 'error' && selectedAdAccount) {
+        console.log('🧪 Testing ad creation process...');
+        adTestResult = await apiClient.testAdCreationProcess(selectedAdAccount.id);
+        console.log('🧪 Ad creation test result:', adTestResult);
+      }
+      
+      setTroubleshootingResult({
+        config: configResult,
+        adTest: adTestResult
+      });
+      
+    } catch (error) {
+      console.error('❌ Troubleshooting failed:', error);
+      setTroubleshootingResult({
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    } finally {
+      setIsTroubleshooting(false);
+    }
+  };
 
   // Template form state
   const [templateForm, setTemplateForm] = useState({
@@ -3153,8 +3195,7 @@ function DashboardContent() {
                   {/* Action Buttons */}
                   <div className="flex gap-4 pt-4">
                     <Button 
-                      onClick={async () => {
-                        // Preview functionality
+                      onClick={() => {
                         toast({
                           title: 'Preview coming soon',
                           description: 'Ad preview functionality will be added',
@@ -3166,6 +3207,17 @@ function DashboardContent() {
                     >
                       Preview Ads
                     </Button>
+                    
+                    {/* Troubleshooting Button */}
+                    <Button 
+                      onClick={runTroubleshooting}
+                      disabled={!isAuthenticated || !apiClient || isTroubleshooting}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      {isTroubleshooting ? '🔍 Troubleshooting...' : '🔧 Troubleshoot'}
+                    </Button>
+                    
                     <Button 
                       onClick={handleCreateBulkAds}
                       disabled={
@@ -3282,6 +3334,156 @@ function DashboardContent() {
           }
         }}
       />
+      
+      {/* Troubleshooting Results */}
+      {troubleshootingResult && (
+        <div className="mt-6 p-4 border rounded-lg bg-gray-50">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            🔍 Troubleshooting Results
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setTroubleshootingResult(null)}
+              className="ml-auto"
+            >
+              ✕
+            </Button>
+          </h3>
+          
+          {troubleshootingResult.error ? (
+            <div className="text-red-600 bg-red-50 p-3 rounded">
+              ❌ Error: {troubleshootingResult.error}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Configuration Results */}
+              {troubleshootingResult.config && (
+                <div>
+                  <h4 className="font-medium mb-2">Configuration Check</h4>
+                  <div className={`p-3 rounded ${
+                    troubleshootingResult.config.status === 'success' ? 'bg-green-50 text-green-800' :
+                    troubleshootingResult.config.status === 'warning' ? 'bg-yellow-50 text-yellow-800' :
+                    'bg-red-50 text-red-800'
+                  }`}>
+                    <div className="font-medium mb-2">
+                      Status: {troubleshootingResult.config.status.toUpperCase()}
+                    </div>
+                    <div className="space-y-2">
+                      {troubleshootingResult.config.checks.map((check: any, index: number) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <span className={`text-sm ${
+                            check.status === 'pass' ? 'text-green-600' :
+                            check.status === 'fail' ? 'text-red-600' :
+                            'text-yellow-600'
+                          }`}>
+                            {check.status === 'pass' ? '✅' : 
+                             check.status === 'fail' ? '❌' : '⚠️'}
+                          </span>
+                          <div className="flex-1">
+                            <div className="font-medium">{check.name}</div>
+                            <div className="text-sm">{check.message}</div>
+                            {check.details && (
+                              <details className="mt-1">
+                                <summary className="text-xs cursor-pointer">Details</summary>
+                                <pre className="text-xs mt-1 bg-white p-2 rounded overflow-auto">
+                                  {JSON.stringify(check.details, null, 2)}
+                                </pre>
+                              </details>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Recommendations */}
+                  {troubleshootingResult.config.recommendations.length > 0 && (
+                    <div className="mt-3">
+                      <h5 className="font-medium mb-2">Recommendations:</h5>
+                      <ul className="list-disc list-inside space-y-1 text-sm">
+                        {troubleshootingResult.config.recommendations.map((rec: string, index: number) => (
+                          <li key={index}>{rec}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Next Steps */}
+                  {troubleshootingResult.config.nextSteps.length > 0 && (
+                    <div className="mt-3">
+                      <h5 className="font-medium mb-2">Next Steps:</h5>
+                      <ul className="list-disc list-inside space-y-1 text-sm">
+                        {troubleshootingResult.config.nextSteps.map((step: string, index: number) => (
+                          <li key={index}>{step}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Ad Creation Test Results */}
+              {troubleshootingResult.adTest && (
+                <div>
+                  <h4 className="font-medium mb-2">Ad Creation Test</h4>
+                  <div className={`p-3 rounded ${
+                    troubleshootingResult.adTest.status === 'success' ? 'bg-green-50 text-green-800' :
+                    troubleshootingResult.adTest.status === 'partial' ? 'bg-yellow-50 text-yellow-800' :
+                    'bg-red-50 text-red-800'
+                  }`}>
+                    <div className="font-medium mb-2">
+                      Status: {troubleshootingResult.adTest.status.toUpperCase()}
+                    </div>
+                    <div className="space-y-2">
+                      {troubleshootingResult.adTest.steps.map((step: any, index: number) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <span className={`text-sm ${
+                            step.status === 'pass' ? 'text-green-600' :
+                            step.status === 'fail' ? 'text-red-600' :
+                            'text-yellow-600'
+                          }`}>
+                            {step.status === 'pass' ? '✅' : 
+                             step.status === 'fail' ? '❌' : '⚠️'}
+                          </span>
+                          <div className="flex-1">
+                            <div className="font-medium">{step.step}</div>
+                            <div className="text-sm">{step.message}</div>
+                            {step.error && (
+                              <div className="text-xs text-red-600 mt-1 bg-red-100 p-2 rounded">
+                                Error: {step.error}
+                              </div>
+                            )}
+                            {step.details && (
+                              <details className="mt-1">
+                                <summary className="text-xs cursor-pointer">Details</summary>
+                                <pre className="text-xs mt-1 bg-white p-2 rounded overflow-auto">
+                                  {JSON.stringify(step.details, null, 2)}
+                                </pre>
+                              </details>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Recommendations */}
+                  {troubleshootingResult.adTest.recommendations.length > 0 && (
+                    <div className="mt-3">
+                      <h5 className="font-medium mb-2">Recommendations:</h5>
+                      <ul className="list-disc list-inside space-y-1 text-sm">
+                        {troubleshootingResult.adTest.recommendations.map((rec: string, index: number) => (
+                          <li key={index}>{rec}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
