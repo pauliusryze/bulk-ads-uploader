@@ -642,73 +642,538 @@ class FacebookAPIClient {
     }
   }
 
-  // Check app configuration for sandbox mode compatibility
-  async checkAppConfiguration(): Promise<{ 
-    appMode: string; 
-    permissions: string[]; 
-    sandboxEnabled: boolean;
+  // Test ad creation process step by step using Facebook API v23.0
+  async testAdCreationProcess(adAccountId: string): Promise<{
+    status: 'success' | 'partial' | 'failed';
+    steps: Array<{
+      step: string;
+      status: 'pass' | 'fail' | 'skip';
+      message: string;
+      details?: any;
+      error?: string;
+    }>;
     recommendations: string[];
   }> {
+    console.log('🧪 Testing ad creation process step by step...');
+    
+    const steps: Array<{
+      step: string;
+      status: 'pass' | 'fail' | 'skip';
+      message: string;
+      details?: any;
+      error?: string;
+    }> = [];
+    
+    const recommendations: string[] = [];
+    
     try {
-      console.log('🔍 Checking app configuration for sandbox compatibility...');
-      
-      // Get app details
-      const appInfo = await this.request<{ 
-        id: string; 
-        name: string; 
-        mode: string;
-        permissions: string[];
-      }>('/me/apps', {
-        method: 'GET',
-      });
-      
-      const recommendations: string[] = [];
-      
-      // Check app mode
-      if (appInfo.mode === 'development') {
-        recommendations.push('✅ App is in development mode (this is fine for sandbox testing)');
-      } else if (appInfo.mode === 'live') {
-        recommendations.push('✅ App is in live mode (this should work for all ad creation)');
+      // Step 1: Test Campaign Creation
+      console.log('🧪 Step 1: Testing campaign creation...');
+      try {
+        const campaignData: FacebookCampaignData = {
+          name: 'Test Campaign - API Test',
+          objective: 'OUTCOME_ENGAGEMENT',
+          status: 'PAUSED'
+        };
+        
+        const campaign = await this.request<{ id: string }>(`/${adAccountId}/campaigns`, {
+          method: 'POST',
+          body: JSON.stringify(campaignData),
+        });
+        
+        steps.push({
+          step: 'Campaign Creation',
+          status: 'pass',
+          message: '✅ Campaign created successfully',
+          details: { campaignId: campaign.id, name: campaignData.name }
+        });
+        
+        // Step 2: Test Ad Set Creation
+        console.log('🧪 Step 2: Testing ad set creation...');
+        try {
+          const adSetData: FacebookAdSetData = {
+            name: 'Test Ad Set - API Test',
+            campaign_id: campaign.id,
+            daily_budget: 1000, // $10.00 in cents
+            billing_event: 'IMPRESSIONS',
+            optimization_goal: 'LINK_CLICKS',
+            targeting: {
+              age_min: 18,
+              age_max: 65,
+              geo_locations: {
+                countries: ['US']
+              }
+            },
+            status: 'PAUSED'
+          };
+          
+          const adSet = await this.request<{ id: string }>(`/${adAccountId}/adsets`, {
+            method: 'POST',
+            body: JSON.stringify(adSetData),
+          });
+          
+          steps.push({
+            step: 'Ad Set Creation',
+            status: 'pass',
+            message: '✅ Ad set created successfully',
+            details: { adSetId: adSet.id, name: adSetData.name }
+          });
+          
+          // Step 3: Test Creative Creation
+          console.log('🧪 Step 3: Testing creative creation...');
+          try {
+            // First, get a page for the creative
+            const pages = await this.request<{ data: FacebookPage[] }>('/me/accounts', {
+              method: 'GET',
+            });
+            
+            if (pages.data && pages.data.length > 0) {
+              const pageId = pages.data[0].id;
+              
+              const creativeData: FacebookCreativeData = {
+                name: 'Test Creative - API Test',
+                object_story_spec: {
+                  page_id: pageId,
+                  link_data: {
+                    message: 'This is a test ad creative created via API v23.0',
+                    link: 'https://www.facebook.com',
+                    name: 'Test Ad'
+                  }
+                }
+              };
+              
+              const creative = await this.request<{ id: string }>(`/${adAccountId}/adcreatives`, {
+                method: 'POST',
+                body: JSON.stringify(creativeData),
+              });
+              
+              steps.push({
+                step: 'Creative Creation',
+                status: 'pass',
+                message: '✅ Creative created successfully',
+                details: { creativeId: creative.id, name: creativeData.name }
+              });
+              
+              // Step 4: Test Ad Creation
+              console.log('🧪 Step 4: Testing ad creation...');
+              try {
+                const adData: FacebookAdData = {
+                  name: 'Test Ad - API Test',
+                  adset_id: adSet.id,
+                  creative: {
+                    creative_id: creative.id
+                  },
+                  status: 'PAUSED'
+                };
+                
+                const ad = await this.request<{ id: string }>(`/${adAccountId}/ads`, {
+                  method: 'POST',
+                  body: JSON.stringify(adData),
+                });
+                
+                steps.push({
+                  step: 'Ad Creation',
+                  status: 'pass',
+                  message: '✅ Ad created successfully',
+                  details: { adId: ad.id, name: adData.name }
+                });
+                
+                // Cleanup: Delete test objects
+                console.log('🧹 Cleaning up test objects...');
+                try {
+                  await this.request(`/${ad.id}`, { method: 'DELETE' });
+                  await this.request(`/${creative.id}`, { method: 'DELETE' });
+                  await this.request(`/${adSet.id}`, { method: 'DELETE' });
+                  await this.request(`/${campaign.id}`, { method: 'DELETE' });
+                  
+                  steps.push({
+                    step: 'Cleanup',
+                    status: 'pass',
+                    message: '✅ Test objects cleaned up successfully'
+                  });
+                  
+                } catch (cleanupError) {
+                  steps.push({
+                    step: 'Cleanup',
+                    status: 'fail',
+                    message: '⚠️ Could not clean up test objects (this is not critical)',
+                    error: cleanupError instanceof Error ? cleanupError.message : 'Unknown error'
+                  });
+                }
+                
+                return { 
+                  status: 'success', 
+                  steps, 
+                  recommendations: ['🎉 Ad creation process is working correctly!'] 
+                };
+                
+              } catch (adError) {
+                steps.push({
+                  step: 'Ad Creation',
+                  status: 'fail',
+                  message: '❌ Ad creation failed',
+                  error: adError instanceof Error ? adError.message : 'Unknown error'
+                });
+                recommendations.push('💡 Check ad creation parameters and targeting');
+                return { status: 'partial', steps, recommendations };
+              }
+              
+            } else {
+              steps.push({
+                step: 'Creative Creation',
+                status: 'skip',
+                message: '⚠️ Skipped - no pages available for creative creation'
+              });
+              recommendations.push('💡 Create or request access to a Facebook page for ad creatives');
+              return { status: 'partial', steps, recommendations };
+            }
+            
+          } catch (creativeError) {
+            steps.push({
+              step: 'Creative Creation',
+              status: 'fail',
+              message: '❌ Creative creation failed',
+              error: creativeError instanceof Error ? creativeError.message : 'Unknown error'
+            });
+            recommendations.push('💡 Check creative parameters and page access');
+            return { status: 'partial', steps, recommendations };
+          }
+          
+        } catch (adSetError) {
+          steps.push({
+            step: 'Ad Set Creation',
+            status: 'fail',
+            message: '❌ Ad set creation failed',
+            error: adSetError instanceof Error ? adSetError.message : 'Unknown error'
+          });
+          recommendations.push('💡 Check ad set parameters and targeting');
+          return { status: 'partial', steps, recommendations };
+        }
+        
+      } catch (campaignError) {
+        steps.push({
+          step: 'Campaign Creation',
+          status: 'fail',
+          message: '❌ Campaign creation failed',
+          error: campaignError instanceof Error ? campaignError.message : 'Unknown error'
+        });
+        recommendations.push('💡 Check campaign parameters and ad account access');
+        return { status: 'failed', steps, recommendations };
       }
-      
-      // Check permissions
-      const requiredPermissions = ['ads_management', 'pages_manage_ads'];
-      const missingPermissions = requiredPermissions.filter(perm => 
-        !appInfo.permissions.includes(perm)
-      );
-      
-      if (missingPermissions.length > 0) {
-        recommendations.push(`⚠️ Missing permissions: ${missingPermissions.join(', ')}`);
-        recommendations.push('💡 Add these permissions in your Facebook app settings');
-      } else {
-        recommendations.push('✅ All required permissions are present');
-      }
-      
-      // Check if sandbox is enabled
-      const sandboxEnabled = this.config.sandboxMode;
-      if (sandboxEnabled) {
-        recommendations.push('✅ Sandbox mode is enabled in the app');
-      } else {
-        recommendations.push('⚠️ Sandbox mode is not enabled - consider enabling for testing');
-      }
-      
-      return {
-        appMode: appInfo.mode,
-        permissions: appInfo.permissions,
-        sandboxEnabled,
-        recommendations
-      };
       
     } catch (error) {
-      console.error('❌ Error checking app configuration:', error);
-      return {
-        appMode: 'unknown',
-        permissions: [],
-        sandboxEnabled: this.config.sandboxMode,
-        recommendations: [
-          '❌ Could not check app configuration',
-          '💡 Please verify your app settings manually in developer.facebook.com'
-        ]
+      console.error('❌ Error during ad creation test:', error);
+      steps.push({
+        step: 'Test Process',
+        status: 'fail',
+        message: '❌ Ad creation test failed',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      return { 
+        status: 'failed', 
+        steps, 
+        recommendations: ['💡 Check your configuration and try again'] 
+      };
+    }
+  }
+
+  // Comprehensive troubleshooting for app configuration using Facebook API v23.0
+  async troubleshootConfiguration(): Promise<{
+    status: 'success' | 'warning' | 'error';
+    checks: Array<{
+      name: string;
+      status: 'pass' | 'fail' | 'warning';
+      message: string;
+      details?: any;
+    }>;
+    recommendations: string[];
+    nextSteps: string[];
+  }> {
+    console.log('🔍 Starting comprehensive configuration troubleshooting...');
+    
+    const checks: Array<{
+      name: string;
+      status: 'pass' | 'fail' | 'warning';
+      message: string;
+      details?: any;
+    }> = [];
+    
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+    
+    try {
+      // Check 1: Access Token Validation
+      console.log('🔍 Check 1: Validating access token...');
+      try {
+        const tokenInfo = await this.request<{ id: string; name: string; permissions: string[] }>('/me', {
+          method: 'GET',
+        });
+        
+        checks.push({
+          name: 'Access Token',
+          status: 'pass',
+          message: '✅ Access token is valid and working',
+          details: { userId: tokenInfo.id, userName: tokenInfo.name }
+        });
+        
+        // Check permissions
+        const requiredPermissions = ['ads_management', 'pages_manage_ads'];
+        const missingPermissions = requiredPermissions.filter(perm => 
+          !tokenInfo.permissions.includes(perm)
+        );
+        
+        if (missingPermissions.length > 0) {
+          checks.push({
+            name: 'User Permissions',
+            status: 'fail',
+            message: `❌ Missing required permissions: ${missingPermissions.join(', ')}`,
+            details: { 
+              required: requiredPermissions, 
+              current: tokenInfo.permissions,
+              missing: missingPermissions 
+            }
+          });
+          recommendations.push('💡 Re-authenticate with Facebook to grant missing permissions');
+        } else {
+          checks.push({
+            name: 'User Permissions',
+            status: 'pass',
+            message: '✅ All required permissions are present',
+            details: { permissions: tokenInfo.permissions }
+          });
+        }
+        
+      } catch (error) {
+        checks.push({
+          name: 'Access Token',
+          status: 'fail',
+          message: '❌ Access token validation failed',
+          details: { error: error instanceof Error ? error.message : 'Unknown error' }
+        });
+        recommendations.push('💡 Check your access token and re-authenticate');
+        return { status: 'error', checks, recommendations, nextSteps };
+      }
+      
+      // Check 2: App Configuration
+      console.log('🔍 Check 2: Checking app configuration...');
+      try {
+        const appInfo = await this.request<{ 
+          id: string; 
+          name: string; 
+          mode: string;
+          permissions: string[];
+        }>('/me/apps', {
+          method: 'GET',
+        });
+        
+        checks.push({
+          name: 'App Configuration',
+          status: appInfo.mode === 'development' ? 'warning' : 'pass',
+          message: appInfo.mode === 'development' 
+            ? '⚠️ App is in development mode (this is fine for sandbox testing)'
+            : '✅ App is in live mode',
+          details: { appId: appInfo.id, appName: appInfo.name, mode: appInfo.mode }
+        });
+        
+        // Check app permissions
+        const appRequiredPermissions = ['ads_management', 'pages_manage_ads'];
+        const appMissingPermissions = appRequiredPermissions.filter(perm => 
+          !appInfo.permissions.includes(perm)
+        );
+        
+        if (appMissingPermissions.length > 0) {
+          checks.push({
+            name: 'App Permissions',
+            status: 'fail',
+            message: `❌ App missing permissions: ${appMissingPermissions.join(', ')}`,
+            details: { 
+              required: appRequiredPermissions, 
+              current: appInfo.permissions,
+              missing: appMissingPermissions 
+            }
+          });
+          recommendations.push('💡 Add missing permissions in your Facebook app settings at developer.facebook.com');
+        } else {
+          checks.push({
+            name: 'App Permissions',
+            status: 'pass',
+            message: '✅ App has all required permissions',
+            details: { permissions: appInfo.permissions }
+          });
+        }
+        
+      } catch (error) {
+        checks.push({
+          name: 'App Configuration',
+          status: 'fail',
+          message: '❌ Could not retrieve app configuration',
+          details: { error: error instanceof Error ? error.message : 'Unknown error' }
+        });
+        recommendations.push('💡 Check your app configuration in developer.facebook.com');
+      }
+      
+      // Check 3: Ad Accounts Access
+      console.log('🔍 Check 3: Checking ad accounts access...');
+      try {
+        const adAccounts = await this.request<{ data: FacebookAdAccount[] }>('/me/adaccounts?fields=id,name,currency,timezone,account_status,business', {
+          method: 'GET',
+        });
+        
+        if (adAccounts.data && adAccounts.data.length > 0) {
+          checks.push({
+            name: 'Ad Accounts Access',
+            status: 'pass',
+            message: `✅ Found ${adAccounts.data.length} ad account(s)`,
+            details: { 
+              count: adAccounts.data.length,
+              accounts: adAccounts.data.map(acc => ({ id: acc.id, name: acc.name, status: acc.account_status }))
+            }
+          });
+          
+          // Check for sandbox accounts
+          const sandboxAccounts = adAccounts.data.filter(acc => 
+            acc.id.includes('sandbox') || acc.name.toLowerCase().includes('sandbox')
+          );
+          
+          if (sandboxAccounts.length > 0) {
+            checks.push({
+              name: 'Sandbox Accounts',
+              status: 'pass',
+              message: `✅ Found ${sandboxAccounts.length} sandbox account(s)`,
+              details: { accounts: sandboxAccounts.map(acc => ({ id: acc.id, name: acc.name })) }
+            });
+          } else {
+            checks.push({
+              name: 'Sandbox Accounts',
+              status: 'warning',
+              message: '⚠️ No sandbox accounts found (this might be expected)',
+              details: { note: 'Sandbox accounts are typically created through developer.facebook.com' }
+            });
+          }
+          
+        } else {
+          checks.push({
+            name: 'Ad Accounts Access',
+            status: 'fail',
+            message: '❌ No ad accounts found',
+            details: { note: 'You need at least one ad account to create ads' }
+          });
+          recommendations.push('💡 Create or request access to an ad account in Facebook Ads Manager');
+        }
+        
+      } catch (error) {
+        checks.push({
+          name: 'Ad Accounts Access',
+          status: 'fail',
+          message: '❌ Could not access ad accounts',
+          details: { error: error instanceof Error ? error.message : 'Unknown error' }
+        });
+        recommendations.push('💡 Check your ad account permissions and access');
+      }
+      
+      // Check 4: Pages Access (for ad creatives)
+      console.log('🔍 Check 4: Checking pages access...');
+      try {
+        const pages = await this.request<{ data: FacebookPage[] }>('/me/accounts', {
+          method: 'GET',
+        });
+        
+        if (pages.data && pages.data.length > 0) {
+          checks.push({
+            name: 'Pages Access',
+            status: 'pass',
+            message: `✅ Found ${pages.data.length} page(s)`,
+            details: { 
+              count: pages.data.length,
+              pages: pages.data.map(page => ({ id: page.id, name: page.name, category: page.category }))
+            }
+          });
+        } else {
+          checks.push({
+            name: 'Pages Access',
+            status: 'warning',
+            message: '⚠️ No pages found (needed for ad creatives)',
+            details: { note: 'Pages are required for creating ad creatives' }
+          });
+          recommendations.push('💡 Create or request access to a Facebook page for ad creation');
+        }
+        
+      } catch (error) {
+        checks.push({
+          name: 'Pages Access',
+          status: 'fail',
+          message: '❌ Could not access pages',
+          details: { error: error instanceof Error ? error.message : 'Unknown error' }
+        });
+        recommendations.push('💡 Check your page permissions and access');
+      }
+      
+      // Check 5: API Version Compatibility
+      console.log('🔍 Check 5: Checking API version...');
+      checks.push({
+        name: 'API Version',
+        status: 'pass',
+        message: '✅ Using Facebook Marketing API v23.0 (latest)',
+        details: { version: 'v23.0', baseUrl: this.baseUrl }
+      });
+      
+      // Check 6: Sandbox Mode Configuration
+      console.log('🔍 Check 6: Checking sandbox mode...');
+      checks.push({
+        name: 'Sandbox Mode',
+        status: this.config.sandboxMode ? 'pass' : 'warning',
+        message: this.config.sandboxMode 
+          ? '✅ Sandbox mode is enabled'
+          : '⚠️ Sandbox mode is not enabled (consider enabling for testing)',
+        details: { sandboxMode: this.config.sandboxMode }
+      });
+      
+      // Determine overall status
+      const failedChecks = checks.filter(check => check.status === 'fail');
+      const warningChecks = checks.filter(check => check.status === 'warning');
+      
+      let overallStatus: 'success' | 'warning' | 'error';
+      if (failedChecks.length > 0) {
+        overallStatus = 'error';
+        nextSteps.push('🔧 Fix the failed checks above before proceeding');
+      } else if (warningChecks.length > 0) {
+        overallStatus = 'warning';
+        nextSteps.push('⚠️ Address the warnings above for optimal functionality');
+      } else {
+        overallStatus = 'success';
+        nextSteps.push('✅ Configuration looks good! Try creating ads now');
+      }
+      
+      // Add specific recommendations based on checks
+      if (failedChecks.some(check => check.name.includes('Permission'))) {
+        nextSteps.push('🔑 Re-authenticate with Facebook to grant required permissions');
+      }
+      
+      if (failedChecks.some(check => check.name.includes('Ad Account'))) {
+        nextSteps.push('📊 Set up an ad account in Facebook Ads Manager');
+      }
+      
+      if (failedChecks.some(check => check.name.includes('Page'))) {
+        nextSteps.push('📄 Create or request access to a Facebook page');
+      }
+      
+      return { status: overallStatus, checks, recommendations, nextSteps };
+      
+    } catch (error) {
+      console.error('❌ Error during troubleshooting:', error);
+      checks.push({
+        name: 'Troubleshooting Process',
+        status: 'fail',
+        message: '❌ Error during configuration check',
+        details: { error: error instanceof Error ? error.message : 'Unknown error' }
+      });
+      
+      return { 
+        status: 'error', 
+        checks, 
+        recommendations: ['💡 Check your internet connection and try again'], 
+        nextSteps: ['🔄 Retry the troubleshooting process'] 
       };
     }
   }
