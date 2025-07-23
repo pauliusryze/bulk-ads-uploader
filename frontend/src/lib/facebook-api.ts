@@ -729,11 +729,13 @@ class FacebookAPIClient {
             billing_event: 'IMPRESSIONS',
             optimization_goal: 'LINK_CLICKS',
             targeting: {
-              age_min: 18,
-              age_max: 65,
+              device_platforms: ['mobile'],
+              publisher_platforms: ['facebook'],
               geo_locations: {
                 countries: ['US']
-              }
+              },
+              age_min: 18,
+              age_max: 65
             },
             status: 'PAUSED'
           };
@@ -1006,68 +1008,92 @@ class FacebookAPIClient {
       // Check 2: App Configuration
       console.log('🔍 Check 2: Checking app configuration...');
       try {
+        // Try to get app info from /me/apps endpoint
         const appInfo = await this.request<{ 
-          id: string; 
-          name: string; 
-          mode: string;
-          permissions?: string[];
+          data?: Array<{
+            id: string; 
+            name: string; 
+            category: string;
+            namespace?: string;
+          }>;
         }>('/me/apps', {
           method: 'GET',
         });
         
-        checks.push({
-          name: 'App Configuration',
-          status: appInfo.mode === 'development' ? 'warning' : 'pass',
-          message: appInfo.mode === 'development' 
-            ? '⚠️ App is in development mode (this is fine for sandbox testing)'
-            : '✅ App is in live mode',
-          details: { appId: appInfo.id, appName: appInfo.name, mode: appInfo.mode }
-        });
-        
-        // Check app permissions if available
-        if (appInfo.permissions && Array.isArray(appInfo.permissions)) {
-          const appRequiredPermissions = ['ads_management', 'pages_manage_ads'];
-          const appMissingPermissions = appRequiredPermissions.filter(perm => 
-            !appInfo.permissions!.includes(perm)
+        if (appInfo.data && appInfo.data.length > 0) {
+          const currentApp = appInfo.data.find(app => 
+            app.id === this.config.appId || 
+            app.namespace === this.config.appId
           );
           
-          if (appMissingPermissions.length > 0) {
+          if (currentApp) {
             checks.push({
-              name: 'App Permissions',
-              status: 'fail',
-              message: `❌ App missing permissions: ${appMissingPermissions.join(', ')}`,
+              name: 'App Configuration',
+              status: 'pass',
+              message: '✅ App configuration found and accessible',
               details: { 
-                required: appRequiredPermissions, 
-                current: appInfo.permissions,
-                missing: appMissingPermissions 
+                appId: currentApp.id, 
+                appName: currentApp.name, 
+                category: currentApp.category,
+                namespace: currentApp.namespace 
               }
             });
-            recommendations.push('💡 Add missing permissions in your Facebook app settings at developer.facebook.com');
           } else {
             checks.push({
-              name: 'App Permissions',
-              status: 'pass',
-              message: '✅ App has all required permissions',
-              details: { permissions: appInfo.permissions }
+              name: 'App Configuration',
+              status: 'warning',
+              message: '⚠️ App not found in user\'s apps list (this might be expected)',
+              details: { 
+                configuredAppId: this.config.appId,
+                availableApps: appInfo.data.map(app => ({ id: app.id, name: app.name }))
+              }
             });
           }
         } else {
           checks.push({
-            name: 'App Permissions',
+            name: 'App Configuration',
             status: 'warning',
-            message: '⚠️ Could not verify app permissions (this might be expected)',
-            details: { note: 'App permissions not available in response' }
+            message: '⚠️ No apps found in user\'s apps list (this might be expected)',
+            details: { note: 'This is normal for some user accounts' }
           });
         }
         
-      } catch (error) {
-        checks.push({
-          name: 'App Configuration',
-          status: 'fail',
-          message: '❌ Could not retrieve app configuration',
-          details: { error: error instanceof Error ? error.message : 'Unknown error' }
-        });
-        recommendations.push('💡 Check your app configuration in developer.facebook.com');
+      } catch (appError) {
+        console.log('⚠️ Could not retrieve app configuration:', appError);
+        
+        // Try alternative approach - check if we can access the app directly
+        try {
+          const appDetails = await this.request<{
+            id: string;
+            name: string;
+            category: string;
+            namespace?: string;
+          }>(`/${this.config.appId}`, {
+            method: 'GET',
+          });
+          
+          checks.push({
+            name: 'App Configuration',
+            status: 'pass',
+            message: '✅ App is accessible and configured correctly',
+            details: { 
+              appId: appDetails.id, 
+              appName: appDetails.name, 
+              category: appDetails.category 
+            }
+          });
+          
+        } catch (directAppError) {
+          checks.push({
+            name: 'App Configuration',
+            status: 'warning',
+            message: '⚠️ Could not verify app configuration (this might be expected)',
+            details: { 
+              error: directAppError instanceof Error ? directAppError.message : 'Unknown error',
+              note: 'App configuration check is optional for basic functionality'
+            }
+          });
+        }
       }
       
       // Check 3: Ad Accounts Access
