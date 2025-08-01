@@ -52,7 +52,7 @@ export const useFacebookAuth = () => {
     const initFacebookSDK = () => {
       if (window.FB) {
         window.FB.init({
-          appId: process.env.REACT_APP_FACEBOOK_APP_ID || 'your-app-id',
+          appId: '1223626443108689',
           cookie: true,
           xfbml: true,
           version: 'v22.0',
@@ -131,7 +131,7 @@ export const useFacebookAuth = () => {
       
       // Initialize API client
       const client = new FacebookAPIClient({
-        appId: process.env.REACT_APP_FACEBOOK_APP_ID || 'your-app-id',
+        appId: '1223626443108689',
         accessToken,
         adAccountId: '', // Will be set when user selects an ad account
         sandboxMode: true, // Start in sandbox mode for safety
@@ -308,7 +308,7 @@ export const useFacebookAuth = () => {
     try {
       // Update API client with selected ad account
       const updatedClient = new FacebookAPIClient({
-        appId: process.env.REACT_APP_FACEBOOK_APP_ID || 'your-app-id',
+        appId: '1223626443108689',
         accessToken: authState.accessToken!,
         adAccountId: adAccount.id,
         sandboxMode: true,
@@ -359,7 +359,7 @@ export const useFacebookAuth = () => {
       console.log('🔍 Starting manual token authentication...');
       
       const client = new FacebookAPIClient({
-        appId: process.env.REACT_APP_FACEBOOK_APP_ID || 'your-app-id',
+        appId: '1223626443108689',
         accessToken: manualAccessToken,
         adAccountId: '',
         sandboxMode: true,
