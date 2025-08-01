@@ -16,7 +16,7 @@ import templateRoutes from './routes/templates';
 import adRoutes from './routes/ads';
 
 const app = express();
-const PORT = parseInt(process.env.PORT || '3001', 10);
+const PORT = parseInt(process.env.PORT || '5555', 10);
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 logger.info('Starting server with configuration:', {
@@ -28,7 +28,7 @@ logger.info('Starting server with configuration:', {
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env['CORS_ORIGIN'] || process.env['FRONTEND_URL'] || 'https://localhost:3000',
+  origin: process.env['CORS_ORIGIN'] || process.env['FRONTEND_URL'] || 'https://localhost:3002',
   credentials: true
 }));
 

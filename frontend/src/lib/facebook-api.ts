@@ -262,37 +262,56 @@ class FacebookAPIClient {
       ...options,
     };
 
-    // For POST requests, use form data format as required by Facebook API
+    // For POST requests, handle different content types appropriately
     if (options.method === 'POST' && options.body) {
-      const bodyData = JSON.parse(options.body as string);
-      const formData = new FormData();
+      // Check if this is an endpoint that requires FormData (like image uploads)
+      const requiresFormData = endpoint.includes('/adimages') || endpoint.includes('/videos');
       
-      // Add access token to form data
-      formData.append('access_token', this.config.accessToken);
-      
-      // Convert JSON body to form data format
-      Object.entries(bodyData).forEach(([key, value]) => {
-        if (value instanceof File) {
-          // Handle File objects directly
-          formData.append(key, value);
-        } else if (typeof value === 'object' && value !== null) {
-          // For nested objects like object_story_spec, stringify them
-          formData.append(key, JSON.stringify(value));
-        } else {
-          formData.append(key, String(value));
+      if (requiresFormData) {
+        // Only convert to FormData for specific endpoints that require it
+        const bodyData = JSON.parse(options.body as string);
+        const formData = new FormData();
+        
+        // Add access token to form data
+        formData.append('access_token', this.config.accessToken);
+        
+        // Convert JSON body to form data format
+        Object.entries(bodyData).forEach(([key, value]) => {
+          if (value instanceof File) {
+            // Handle File objects directly
+            formData.append(key, value);
+          } else if (typeof value === 'object' && value !== null) {
+            // For nested objects, stringify them
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, String(value));
+          }
+        });
+        
+        // Replace the body with form data
+        config.body = formData;
+        
+        // Remove Content-Type header to let browser set it with boundary
+        if (config.headers) {
+          delete (config.headers as any)['Content-Type'];
         }
-      });
-      
-      // Replace the body with form data
-      config.body = formData;
-      
-      // Remove Content-Type header to let browser set it with boundary
-      if (config.headers) {
-        delete (config.headers as any)['Content-Type'];
+        
+        console.log('📝 Converting to form data format for Facebook API');
+        console.log('📝 Form data entries:', Array.from(formData.entries()));
+      } else {
+        // For other endpoints (campaigns, adsets, adcreatives, ads), keep as JSON
+        config.headers = {
+          ...config.headers,
+          'Content-Type': 'application/json',
+        };
+        
+        // Add access token to the body for JSON requests
+        const bodyData = JSON.parse(options.body as string);
+        bodyData.access_token = this.config.accessToken;
+        config.body = JSON.stringify(bodyData);
+        
+        console.log('📝 Keeping JSON format for Facebook API endpoint:', endpoint);
       }
-      
-      console.log('📝 Converting to form data format for Facebook API');
-      console.log('📝 Form data entries:', Array.from(formData.entries()));
     }
     
     try {

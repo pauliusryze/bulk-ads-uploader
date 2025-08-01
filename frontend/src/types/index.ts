@@ -66,6 +66,7 @@ export interface AdvantagePlusEnhancements {
 export interface EnhancedBulkAdRequest {
   items: BulkAdItem[];
   templateId: string;
+  campaignId?: string; // For using existing campaign
   options: {
     createCampaign: boolean;
     createAdSet: boolean;

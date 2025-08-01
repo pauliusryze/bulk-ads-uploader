@@ -107,7 +107,7 @@ export class AdService {
       let campaignId: string | undefined;
       let adSetId: string | undefined;
 
-      // Create campaign if requested
+      // Create campaign if requested or use existing campaign
       if (request.options.createCampaign) {
         try {
           campaignId = await facebookService.createCampaign(
@@ -121,6 +121,16 @@ export class AdService {
           job.results.errors.push(errorMsg);
           logger.error('Campaign creation failed', { jobId, error: errorMsg });
         }
+      } else if (request.campaignId) {
+        // Use existing campaign
+        campaignId = request.campaignId;
+        job.results.campaignId = campaignId;
+        logger.info('Using existing campaign', { jobId, campaignId });
+      } else {
+        const errorMsg = 'Campaign ID is required when not creating a new campaign';
+        job.results.errors.push(errorMsg);
+        logger.error('No campaign ID provided', { jobId });
+        throw new AppError(errorMsg, 400);
       }
 
       // Create ad set if requested

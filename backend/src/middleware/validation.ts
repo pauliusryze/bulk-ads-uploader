@@ -106,6 +106,13 @@ export const bulkAdSchema = Joi.object({
     'string.max': 'Campaign name must be less than 100 characters',
     'any.required': 'Campaign name is required'
   }),
+  campaignId: Joi.string().when('options.createCampaign', {
+    is: false,
+    then: Joi.required().messages({
+      'any.required': 'Campaign ID is required when not creating a new campaign'
+    }),
+    otherwise: Joi.optional()
+  }),
   adSetName: Joi.string().min(1).max(100).required().messages({
     'string.empty': 'Ad Set name is required',
     'string.min': 'Ad Set name must be at least 1 character',

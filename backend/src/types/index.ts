@@ -153,6 +153,7 @@ export interface BulkAdRequest {
   templateId: string;
   media: string[]; // Media IDs (images or videos)
   campaignName: string;
+  campaignId?: string; // For using existing campaign
   adSetName: string;
   options: {
     createCampaign: boolean;
