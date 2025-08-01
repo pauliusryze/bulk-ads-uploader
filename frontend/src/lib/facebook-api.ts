@@ -1690,25 +1690,106 @@ class FacebookAPIClient {
     }
   }
 
-  // Upload image using Marketing API (legacy approach)
-  private async uploadImageViaMarketingAPI(adAccountId: string, file: File): Promise<{ id: string; hash: string }> {
-    const uploadData = {
-      source: file,
-      name: file.name
-    };
+  // Helper function to convert File to base64
+  private async fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        // Remove the data:image/xxx;base64, prefix
+        const base64Data = base64String.split(',')[1];
+        resolve(base64Data);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
 
-    const result = await this.request<{ id: string; images?: any }>(`/${adAccountId}/adimages`, {
-      method: 'POST',
-      body: JSON.stringify(uploadData),
+  // Upload image using Marketing API
+  private async uploadImageViaMarketingAPI(adAccountId: string, file: File): Promise<{ id: string; hash: string }> {
+    console.log("📤 Uploading image to Facebook:", {
+      filename: file.name,
+      size: file.size,
+      type: file.type,
+      adAccountId: adAccountId
     });
 
-    const imageData = result.images && result.images[Object.keys(result.images)[0]];
-    console.log("🖼️ Image uploaded via Marketing API - Hash:", imageData?.hash);
-    
-    return {
-      id: imageData?.hash || result.id,
-      hash: imageData?.hash || result.id
-    };
+    try {
+      // Create FormData for image upload
+      const formData = new FormData();
+
+      // Facebook expects either 'filename' (multipart file) or 'bytes' (base64 string).
+      // Using 'filename' with the raw File object tends to be more reliable and avoids base64 size inflation.
+      formData.append('filename', file, file.name);
+
+      // Optional: Add a sanitized name field (without extension) for easier identification in Asset Library
+      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9_-]/g, '_');
+      formData.append('name', nameWithoutExt);
+
+      console.log("📦 Prepared multipart form-data for image upload:", Array.from(formData.entries()));
+
+      // Use fetch directly for multipart upload
+      const url = `https://graph.facebook.com/v22.0/${adAccountId}/adimages?access_token=${encodeURIComponent(this.config.accessToken)}`;
+      console.log("🌐 Upload URL:", url);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.config.accessToken}`,
+        },
+        body: formData,
+      });
+
+      const responseText = await response.text();
+      console.log("📨 Raw response:", responseText);
+
+      if (!response.ok) {
+        let errorMessage = `Image upload failed: HTTP ${response.status}`;
+        try {
+          const error = JSON.parse(responseText);
+          errorMessage = error.error?.message || errorMessage;
+          console.error("❌ Facebook API Error:", error);
+        } catch (parseError) {
+          console.error("❌ Failed to parse upload error response:", responseText);
+        }
+        throw new Error(errorMessage);
+      }
+
+      try {
+        const result = JSON.parse(responseText);
+        console.log("✅ Upload response:", result);
+        
+        // Facebook returns images as an object with filename as key
+        const images = result.images || {};
+        const imageKeys = Object.keys(images);
+        
+        if (imageKeys.length === 0) {
+          throw new Error("No image data returned from Facebook");
+        }
+        
+        const imageData = images[imageKeys[0]];
+        console.log("🖼️ Image uploaded successfully:", {
+          hash: imageData?.hash,
+          url: imageData?.url,
+          filename: imageKeys[0]
+        });
+        
+        if (!imageData?.hash) {
+          throw new Error("No image hash returned from Facebook");
+        }
+        
+        return {
+          id: imageData.hash,
+          hash: imageData.hash
+        };
+      } catch (error) {
+        console.error("❌ Failed to process upload response:", error);
+        throw error;
+      }
+    } catch (error) {
+      console.error("❌ Image upload failed:", error);
+      throw error;
+    }
   }
 
   // Upload video using Video Ads API (4-step process)
