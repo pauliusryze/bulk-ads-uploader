@@ -1748,8 +1748,10 @@ class FacebookAPIClient {
       console.log("📦 Prepared multipart form-data for image upload:", Array.from(formData.entries()));
 
       // Use fetch directly for multipart upload
-      const url = `https://graph.facebook.com/v22.0/${adAccountId}/adimages?access_token=${encodeURIComponent(this.config.accessToken)}&app_id=${this.config.appId}`;
+      // Remove app_id from URL - it's not needed when using access token
+      const url = `https://graph.facebook.com/v22.0/${adAccountId}/adimages?access_token=${encodeURIComponent(this.config.accessToken)}`;
       console.log("🌐 Upload URL:", url);
+      console.log("🔑 App ID:", this.config.appId);
 
       const response = await fetch(url, {
         method: 'POST',
